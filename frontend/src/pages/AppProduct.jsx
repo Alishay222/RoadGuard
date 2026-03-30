@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './AppProduct.css'
+import AuthModal from '../components/AuthModal'
+import ThemeToggle from '../components/ThemeToggle'
+import { useAuth } from '../context/AuthContext'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
@@ -66,12 +69,13 @@ function toIncidentKey(value) {
 }
 
 async function requestBackend(path, options = {}) {
+  const { headers: extraHeaders, ...restOptions } = options
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...(options.headers || {}),
+      ...(extraHeaders || {}),
     },
-    ...options,
   })
 
   if (!response.ok) {
@@ -104,12 +108,15 @@ function getAssistantReply(message) {
 }
 
 export default function AppProduct() {
+  const { isLoggedIn, logout, token } = useAuth()
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
   const [chatOpen, setChatOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
+  const [reportSubmitting, setReportSubmitting] = useState(false)
+  const [reportError, setReportError] = useState('')
   const [reportForm, setReportForm] = useState({
     incidentType: 'Accident',
     location: '',
@@ -533,14 +540,34 @@ export default function AppProduct() {
     setReportForm((previousData) => ({ ...previousData, [name]: value }))
   }
 
-  const handleReportSubmit = (event) => {
+  const handleReportSubmit = async (event) => {
     event.preventDefault()
-    setReportSubmitted(true)
+    setReportError('')
+    setReportSubmitting(true)
+    try {
+      await requestBackend('/api/incidents/report', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          incidentType: reportForm.incidentType,
+          location: reportForm.location,
+          details: reportForm.details,
+          lat: currentCoordinates?.latitude ?? null,
+          lng: currentCoordinates?.longitude ?? null,
+        }),
+      })
+      setReportSubmitted(true)
+    } catch {
+      setReportError('Failed to submit report. Please try again.')
+    } finally {
+      setReportSubmitting(false)
+    }
   }
 
   const handleCloseReport = () => {
     setReportOpen(false)
     setReportSubmitted(false)
+    setReportError('')
     setReportForm({
       incidentType: 'Accident',
       location: '',
@@ -549,7 +576,11 @@ export default function AppProduct() {
   }
 
   const handleAuthAction = () => {
-    setIsLoggedIn((previous) => !previous)
+    if (isLoggedIn) {
+      logout()
+    } else {
+      setAuthModalOpen(true)
+    }
     setProfileOpen(false)
   }
 
@@ -604,6 +635,12 @@ export default function AppProduct() {
 
   return (
     <div className="app-product" aria-label="Traffic Safety & Alert app screen">
+      {authModalOpen && (
+        <AuthModal
+          onClose={() => setAuthModalOpen(false)}
+          reason="Sign in to report an incident."
+        />
+      )}
       {livePopup && (
         <div className="app-product__live-popup" role="alert">
           <span className="app-product__live-popup-icon">🚨</span>
@@ -693,7 +730,19 @@ export default function AppProduct() {
           <section className="app-product__lower-grid">
             <div className="app-product__left-half">
               <div className="app-product__actions">
-                <button type="button" className="action-btn action-btn--report" onClick={() => setReportOpen(true)}>❗ Report Incident</button>
+                <button
+                  type="button"
+                  className="action-btn action-btn--report"
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      setReportOpen(true)
+                    } else {
+                      setAuthModalOpen(true)
+                    }
+                  }}
+                >
+                  ❗ Report Incident
+                </button>
                 <button type="button" className="action-btn action-btn--sos" onClick={handleSosShare}>📞 SOS</button>
               </div>
               <div className="app-product__left-panel">
@@ -800,7 +849,15 @@ export default function AppProduct() {
                     required
                   />
 
-                  <button type="submit" className="app-product__report-submit">Submit</button>
+                  {reportError && (
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#f87171', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+                      {reportError}
+                    </p>
+                  )}
+
+                  <button type="submit" className="app-product__report-submit" disabled={reportSubmitting}>
+                    {reportSubmitting ? 'Submitting...' : 'Submit'}
+                  </button>
                 </form>
               )}
             </div>
