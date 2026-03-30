@@ -1,27 +1,66 @@
-/* Dark, modern theme: emerald accent on deep slate background */
 :root {
-  --bg: #020617;
-  --bg-elevated: #020617;
-  --bg-warm: #020617;
-  --bg-section-alt: #020617;
-  --bg-section-green: #022c22;
-  --surface: #020617;
-  --border: rgba(148, 163, 184, 0.25);
-  --text: #e5e7eb;
-  --text-muted: #9ca3af;
-  --accent: #22c55e;
-  --accent-hover: #16a34a;
-  --accent-dark: #020617;
-  --accent-soft: rgba(34, 197, 94, 0.18);
-  --hero-gradient-left: #022c22;
-  --hero-gradient-right: #0f172a;
+  /* Common variables */
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius: 12px;
   --radius-lg: 20px;
   --radius-full: 100px;
-  --shadow: 0 2px 20px rgba(15, 23, 42, 0.45);
-  --shadow-hover: 0 18px 45px rgba(15, 23, 42, 0.75);
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Light Theme (Default) */
+  --bg: #fdfcf5;
+  --bg-elevated: #fffefc;
+  --bg-warm: #f9f7f0;
+  --bg-section-alt: #f9f7f0;
+  --bg-section-green: #dcfce7;
+  --surface: #fffefc;
+  --border: rgba(15, 23, 42, 0.10);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-dark: #ffffff;
+  --accent-soft: rgba(21, 128, 61, 0.10);
+  --hero-gradient-left: #bbf7d0;
+  --hero-gradient-right: #dcfce7;
+  --bg-header: #f1f5f9;
+  --bg-footer: #f1f5f9;
+  --bg-dashboard: #f1f5f9;
+  --text-header: #0f172a;
+  --shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.08);
+  --shadow-hover: 0 18px 45px rgba(15, 23, 42, 0.12);
+  --overlay: rgba(15, 23, 42, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme='dark'] {
+  --bg: #020617;
+  --bg-elevated: #0f172a;
+  --bg-warm: #020617;
+  --bg-section-alt: #020617;
+  --bg-section-green: #064e3b;
+  --surface: #1e293b;
+  --border: rgba(148, 163, 184, 0.15);
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #22c55e;
+  --accent-hover: #16a34a;
+  --accent-dark: #020617;
+  --accent-soft: rgba(34, 197, 94, 0.12);
+  --hero-gradient-left: #064e3b;
+  --hero-gradient-right: #020617;
+  --bg-header: #f1f5f9;
+  --bg-footer: #0f172a;
+  --bg-dashboard: #020617;
+  --text-header: #0f172a;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 18px 45px rgba(0, 0, 0, 0.55);
+  --overlay: rgba(2, 6, 23, 0.65);
+  --glass-bg: rgba(15, 23, 42, 0.85);
+  --glass-border: rgba(148, 163, 184, 0.1);
 }
 
 * {
@@ -53,10 +92,16 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.14) 0, transparent 55%),
-    radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.18) 0, transparent 55%),
-    radial-gradient(circle at 0% 80%, rgba(236, 72, 153, 0.12) 0, transparent 55%);
-  opacity: 0.55;
+    radial-gradient(circle at 10% 20%, var(--hero-gradient-left) 0, transparent 55%),
+    radial-gradient(circle at 80% 0%, var(--accent-soft) 0, transparent 55%),
+    radial-gradient(circle at 0% 80%, var(--hero-gradient-right) 0, transparent 55%);
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+  transition: var(--transition);
+}
+
+[data-theme='dark'] body::before {
+  opacity: 0.45;
   mix-blend-mode: screen;
 }
 

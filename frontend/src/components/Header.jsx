@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconShield } from './Icons'
+import ThemeToggle from './ThemeToggle'
 import './Header.css'
 
 const NAV_LINKS = [
@@ -33,6 +34,7 @@ export default function Header() {
           ))}
         </nav>
         <div className="header__actions">
+          <ThemeToggle />
           <Link to="/app" className="header__cta header__cta--primary">
             Get Started
           </Link>

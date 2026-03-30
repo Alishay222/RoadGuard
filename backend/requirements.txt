@@ -7,3 +7,8 @@ python-dateutil
 sentence-transformers
 faiss-cpu
 numpy
+python-jose[cryptography]
+passlib[bcrypt]
+email-validator
+motor
+python-dotenv

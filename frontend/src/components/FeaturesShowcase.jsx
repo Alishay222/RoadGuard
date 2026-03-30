@@ -32,7 +32,7 @@ export default function FeaturesShowcase() {
   }, [])
 
   return (
-    <section ref={ref} className={'features-showcase ' + (inView ? 'in-view' : '')} aria-labelledby="showcase-heading">
+    <section id="features" ref={ref} className={'features-showcase ' + (inView ? 'in-view' : '')} aria-labelledby="showcase-heading">
       <div className="features-showcase__bg" aria-hidden="true" />
       <div className="features-showcase__inner">
         <p className="features-showcase__eyebrow">Features</p>

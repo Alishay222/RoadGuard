@@ -1,6 +1,6 @@
 .cta-section {
   padding: 5rem 1.5rem;
-  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  background: linear-gradient(180deg, var(--hero-gradient-left) 0%, var(--hero-gradient-right) 100%);
   border-top: 1px solid var(--border);
 }
 

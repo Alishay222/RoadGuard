@@ -14,39 +14,42 @@
 }
 
 .app-product {
-  --app-border-strong: rgba(148, 163, 184, 0.5);
+  --app-border-strong: var(--border);
   height: 100vh;
   height: 100dvh;
-  background: #01040f;
+  background: var(--bg-dashboard);
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: stretch;
   overflow: hidden;
+  transition: background var(--transition);
 }
 
 .app-product__phone {
   width: 100%;
   height: 100%;
   border-radius: 0;
-  background: #0b1220;
+  background: var(--bg-elevated);
   border: 0;
   box-shadow: inset 0 0 0 1px var(--app-border-strong);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
+  transition: background var(--transition);
 }
 
 .app-product__header-shell {
   width: 100%;
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--bg-header);
+  color: var(--text-header);
   position: relative;
   z-index: 20;
-  border-bottom: 1px solid #d1d5db;
+  border-bottom: 1px solid var(--border);
   padding: clamp(0.5rem, 0.7vh, 0.55rem) clamp(0.9rem, 1.8vw, 1.6rem) clamp(0.9rem, 1.6vh, 1.2rem);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), color var(--transition);
 }
 
 .app-product__topbar {
@@ -92,15 +95,16 @@
 .app-product__icon-btn {
   border: none;
   background: transparent;
-  color: #374151;
+  color: var(--text-header);
   width: clamp(32px, 2.8vw, 42px);
   height: clamp(32px, 2.8vw, 42px);
   border-radius: 50%;
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all var(--transition);
+  padding: 0;
 }
 
 .app-product__icon-btn--menu {
@@ -110,16 +114,16 @@
 }
 
 .app-product__icon-btn:hover {
-  background: #f3f4f6;
+  background: var(--bg-warm);
 }
 
 .app-product__icon-btn--filled {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-warm);
+  color: var(--text);
 }
 
 .app-product__icon-btn--filled:hover {
-  background: #e5e7eb;
+  background: var(--border);
 }
 
 .app-product__icon-svg {
@@ -197,7 +201,7 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(2, 6, 23, 0.45);
+  background: rgba(15, 23, 42, 0.25);
   z-index: 21;
 }
 
@@ -214,9 +218,9 @@
 
 .app-product__search {
   width: 100%;
-  border: 1px solid var(--app-border-strong);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background-color: #e5e7eb;
+  background-color: #ffffff;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364758b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 18px 18px;
@@ -225,11 +229,13 @@
   font-size: clamp(0.85rem, 1.25vw, 1.2rem);
   padding: clamp(0.5rem, 0.95vh, 0.72rem) clamp(0.55rem, 1vw, 0.9rem) clamp(0.5rem, 0.95vh, 0.72rem) 2.35rem;
   min-height: clamp(42px, 5.8vh, 56px);
-  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.28);
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
 }
 
 .app-product__search::placeholder {
-  color: #64748b;
+  color: #64758b;
+  opacity: 0.7;
 }
 
 .app-product__content {
@@ -240,8 +246,9 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  background: rgba(2, 6, 23, 0.28);
+  background: var(--bg-dashboard);
   overflow: hidden;
+  transition: background var(--transition);
 }
 
 .app-product__map {
@@ -249,7 +256,7 @@
   border: 1px solid var(--app-border-strong);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35), 0 0 16px rgba(34, 197, 94, 0.32), 0 10px 24px rgba(2, 6, 23, 0.32);
+  box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow-lg);
 }
 
 .app-product__leaflet-map {
@@ -301,9 +308,10 @@
   font-weight: 700;
   padding: clamp(0.75rem, 1.5vh, 1.05rem) clamp(0.8rem, 1.3vw, 1.2rem);
   min-height: clamp(46px, 6.4vh, 68px);
-  color: var(--text);
+  color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 12px 18px -8px rgba(2, 6, 23, 0.55);
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
 }
 
 .action-btn--report {
@@ -350,10 +358,11 @@
 
 .card {
   border: 1px solid var(--app-border-strong);
-  background: rgba(15, 23, 42, 0.86);
+  background: var(--bg-elevated);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.3);
+  box-shadow: var(--shadow);
+  transition: background var(--transition);
 }
 
 .card--contacts {
@@ -364,11 +373,12 @@
   grid-row: auto;
   border: 0;
   border-radius: 0;
-  background: rgba(2, 6, 23, 0.72);
+  background: var(--bg-elevated);
   min-height: clamp(108px, 15.5vh, 144px);
   max-height: 100%;
   display: flex;
   flex-direction: column;
+  transition: background var(--transition);
 }
 
 .card--alerts {
@@ -381,8 +391,9 @@
 }
 
 .card--location {
-  background: rgba(2, 6, 23, 0.76);
+  background: var(--bg-elevated);
   min-height: 84px;
+  transition: background var(--transition);
 }
 
 .card__title-row {
@@ -391,12 +402,12 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: clamp(0.35rem, 0.65vh, 0.5rem) clamp(0.5rem, 0.9vw, 0.72rem);
-  background: rgba(34, 197, 94, 0.16);
+  background: rgba(22, 163, 74, 0.08);
 }
 
 .card__location-meta {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--text-muted);
   font-size: clamp(0.62rem, 0.82vw, 0.76rem);
   line-height: 1;
   white-space: nowrap;
@@ -412,7 +423,7 @@
 
 .card__title {
   margin: 0;
-  background: rgba(34, 197, 94, 0.16);
+  background: rgba(22, 163, 74, 0.08);
   color: var(--text);
   font-size: clamp(0.8rem, 1.2vw, 1.15rem);
   font-weight: 700;
@@ -425,16 +436,16 @@
 }
 
 .card--location .card__title {
-  color: #60a5fa;
+  color: var(--accent);
 }
 
 .card__title--warning {
   color: #facc15;
-  background: rgba(34, 197, 94, 0.12);
+  background: var(--accent-soft);
 }
 
 .card--contacts-inline .card__title {
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .card__list {
@@ -447,6 +458,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  border-top: 1px solid var(--border);
 }
 
 .card__list li {
@@ -505,7 +517,7 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  color: #fde68a;
+  color: #92400e;
 }
 
 .card__alert-sign {
@@ -543,22 +555,23 @@
   grid-column: 1 / -1;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(2, 6, 23, 0.72);
+  background: var(--bg-elevated);
   color: var(--text);
   font-size: clamp(0.72rem, 1.02vw, 0.95rem);
   padding: clamp(0.35rem, 0.65vh, 0.5rem) clamp(0.5rem, 0.9vw, 0.72rem);
+  transition: all var(--transition);
 }
 
 .app-product__right-panel {
   border: 1px solid var(--app-border-strong);
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.88);
+  background: #ffffff;
   display: grid;
   grid-template-rows: 1fr auto auto;
   overflow: hidden;
   flex: 1;
   min-height: 0;
-  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.32);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
 }
 
 .app-product__report-overlay {
@@ -572,7 +585,7 @@
 .app-product__report-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(2, 6, 23, 0.62);
+  background: var(--overlay);
 }
 
 .app-product__report-modal {
@@ -627,10 +640,11 @@
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(2, 6, 23, 0.72);
+  background: var(--bg-warm);
   color: var(--text);
   padding: 0.48rem 0.58rem;
   font-size: clamp(0.72rem, 0.96vw, 0.9rem);
+  transition: all var(--transition);
 }
 
 .app-product__report-textarea {
@@ -679,7 +693,7 @@
 .app-product__chat-caption {
   display: inline-flex;
   align-items: center;
-  background: rgba(15, 23, 42, 0.92);
+  background: var(--bg-elevated);
   border: 1px solid var(--app-border-strong);
   color: var(--text);
   border-radius: 999px;
@@ -687,6 +701,7 @@
   font-size: clamp(0.66rem, 0.92vw, 0.82rem);
   line-height: 1;
   white-space: nowrap;
+  box-shadow: var(--shadow);
 }
 
 .app-product__chat-fab {
@@ -726,7 +741,7 @@
   min-height: 34px;
   padding: 0.35rem 2rem 0.35rem 0.45rem;
   border-radius: 8px;
-  background: rgba(34, 197, 94, 0.14);
+  background: var(--accent-soft);
   color: var(--text);
   font-size: clamp(0.76rem, 1.02vw, 0.95rem);
 }
@@ -750,8 +765,9 @@
 
 .app-product__chat-message--assistant {
   align-self: flex-start;
-  background: rgba(148, 163, 184, 0.14);
+  background: var(--bg-warm);
   color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .app-product__chat-thinking {
@@ -837,7 +853,8 @@
   padding: 0.45rem 0.55rem;
   font-size: clamp(0.72rem, 0.98vw, 0.9rem);
   color: var(--text);
-  background: rgba(2, 6, 23, 0.75);
+  background: var(--bg-warm);
+  transition: all var(--transition);
 }
 
 .app-product__chat-send {
@@ -913,12 +930,18 @@
 }
 
 .tag--safe {
-  width: clamp(24px, 2.2vw, 34px);
-  height: clamp(24px, 2.2vw, 34px);
-  justify-content: center;
-  padding: 0;
-  background: #4aa657;
-  font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+  background: rgba(10, 20, 40, 0.82);
+  backdrop-filter: blur(6px);
+  color: #4ade80;
+  border: 1.5px solid rgba(34, 197, 94, 0.45);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  letter-spacing: 0.03em;
+  width: auto;
+  height: auto;
+  justify-content: flex-start;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 900px) {
