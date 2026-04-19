@@ -27,8 +27,14 @@ python -m pip install -r requirements.txt
 3. Run server from `backend` folder:
 
 ```powershell
+# For network access (mobile app, remote clients):
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# For local testing only:
 python -m uvicorn app.main:app --reload --port 8000
 ```
+
+**Important**: Use `--host 0.0.0.0` when testing with mobile devices or remote clients so the backend listens on all network interfaces, not just localhost.
 
 ## What this backend does
 

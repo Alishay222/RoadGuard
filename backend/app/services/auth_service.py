@@ -14,7 +14,9 @@ SECRET_KEY = "roadguard-dev-secret"   # Change to env var before production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7   # 7 days
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# bcrypt backend in some Python environments (notably 3.13 combos) can fail
+# during initialization. pbkdf2_sha256 is stable and supported by passlib.
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)
 
 

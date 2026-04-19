@@ -373,3 +373,29 @@ class RoadGuardDataStore:
             "notes": row.get("notes") or route_row.get("notes"),
             "city": row.get("city") or city,
         }
+
+    def get_emergency_contacts(self, city: str | None = None, limit: int = 200) -> list[dict[str, Any]]:
+        contacts = self.city_contacts.copy() if not self.city_contacts.empty else self.emergency_contacts.copy()
+        if contacts.empty:
+            return []
+
+        if city:
+            city_lower = city.strip().lower()
+            if "city" in contacts.columns:
+                filtered = contacts[contacts["city"].fillna("").str.lower() == city_lower]
+                if not filtered.empty:
+                    contacts = filtered
+
+        rows: list[dict[str, Any]] = []
+        for _, row in contacts.head(max(1, min(limit, 500))).iterrows():
+            row_dict = row.fillna("").to_dict()
+            rows.append(
+                {
+                    "service": row_dict.get("service"),
+                    "phone_number": row_dict.get("phone_number"),
+                    "when_to_contact": row_dict.get("when_to_contact"),
+                    "notes": row_dict.get("notes"),
+                    "city": row_dict.get("city") or city or "",
+                }
+            )
+        return rows

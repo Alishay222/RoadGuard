@@ -1,0 +1,8 @@
+{
+  "debug500@roadguard.dev": {
+    "email": "debug500@roadguard.dev",
+    "name": "Debug User",
+    "hashed_password": "$pbkdf2-sha256$29000$6V0LQQhBSIlxbu2dcw4BYA$lEB27U/vqnXkchbAbm0bnV270bzPbCIWxYwG8txlJgw",
+    "created_at": "2026-04-18T18:31:17.811247+00:00"
+  }
+}

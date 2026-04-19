@@ -69,6 +69,17 @@ def get_contact(request: Request, payload: IncidentRequest) -> dict[str, Any]:
     return result
 
 
+@router.get("/api/contacts")
+def get_contacts(
+    request: Request,
+    city: str | None = None,
+    limit: int = Query(default=200, ge=1, le=500),
+) -> dict[str, Any]:
+    store = request.app.state.store
+    items = store.get_emergency_contacts(city=city, limit=limit)
+    return {"count": len(items), "items": items}
+
+
 @router.post("/api/incidents/report")
 async def submit_report(
     payload: ReportRequest,
