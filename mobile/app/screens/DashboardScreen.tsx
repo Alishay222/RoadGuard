@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Modal,
   Alert,
   Image,
   Linking,
@@ -19,6 +20,7 @@ import { router } from 'expo-router';
 import { useAuth } from '@/app/context/AuthContext';
 import { AlertsResponse, EmergencyContact, IncidentsResponse, Incident } from '@/app/types';
 import { apiClient } from '@/services/api';
+
 
 const DEFAULT_CITY = 'Islamabad';
 const DEFAULT_REGION = {
