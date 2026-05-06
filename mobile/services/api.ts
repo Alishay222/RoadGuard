@@ -7,6 +7,8 @@ import {
   IncidentsResponse,
   AlertsResponse,
   EmergencyContactsResponse,
+  ReportIncidentRequest,
+  ReportIncidentResponse,
   TextRequest,
 } from '@/app/types';
 
@@ -216,6 +218,11 @@ class APIClient {
 
     endpoint += params.join('&');
     return this.fetch(endpoint, 'GET', undefined, true, 15000);
+  }
+
+  // ── Report Incident Endpoint ──────────────────────────────────────────────
+  async reportIncident(incident: ReportIncidentRequest): Promise<ReportIncidentResponse> {
+    return this.fetch('/api/incidents/report', 'POST', incident);
   }
 
   // ── NLU Endpoints ─────────────────────────────────────────────────────────

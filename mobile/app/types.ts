@@ -98,6 +98,22 @@ export interface EmergencyContactsResponse {
   items: EmergencyContact[];
 }
 
+export interface ReportIncidentRequest {
+  incidentType: string;
+  location: string;
+  details: string;
+  lat?: number;
+  lng?: number;
+}
+
+export interface ReportIncidentResponse {
+  success: boolean;
+  message: string;
+  incident?: {
+    id: string;
+  };
+}
+
 // Stats for Dashboard
 export interface DashboardStats {
   totalIncidents: number;
