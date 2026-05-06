@@ -297,6 +297,15 @@ export default function DashboardScreen() {
               <TouchableOpacity style={styles.profileItem} onPress={() => setProfileMenuOpen(false)}>
                 <Text style={styles.profileText}>Profile</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.profileItem}
+                onPress={() => {
+                  setProfileMenuOpen(false);
+                  router.push('/screens/SettingsScreen');
+                }}
+              >
+                <Text style={styles.profileText}>Settings</Text>
+              </TouchableOpacity>
               {isSignedIn ? (
                 <TouchableOpacity style={styles.profileItem} onPress={handleLogout}>
                   <Text style={styles.profileText}>Logout</Text>

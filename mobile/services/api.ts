@@ -11,9 +11,10 @@ import {
 } from '@/app/types';
 
 // API Configuration - change these based on your environment
-// For local network testing: use your computer's IP (e.g., 192.168.100.6)
+// For local network testing: use your computer's IP (e.g., 192.168.18.13)
 // For localhost testing (web/emulator): use 'http://localhost:8000'
-const API_BASE_URL = 'http://192.168.100.6:8000'; // Change IP to your machine's IP
+const API_BASE_URL = 'http://192.168.18.13:8000'; // Change IP to your machine's IP
+const API_BASE_OVERRIDE_KEY = 'roadguard_api_base'
 const REQUEST_TIMEOUT_MS = 8000;
 
 const TOKEN_KEY = 'roadguard_auth_token';
@@ -28,6 +29,13 @@ class APIClient {
       this.token = await SecureStore.getItemAsync(TOKEN_KEY);
     } catch (err) {
       console.warn('Failed to retrieve token from secure storage', err);
+    }
+    // Load optional runtime API base URL override
+    try {
+      const override = await SecureStore.getItemAsync(API_BASE_OVERRIDE_KEY)
+      if (override) this.baseUrl = override
+    } catch (err) {
+      console.warn('Failed to read API base override from secure storage', err)
     }
   }
 
@@ -51,6 +59,29 @@ class APIClient {
       await SecureStore.deleteItemAsync(USER_KEY);
     } catch (err) {
       console.warn('Failed to clear secure storage', err);
+    }
+  }
+
+  // ── Runtime API base URL helpers ────────────────────────────────────────
+  getBaseUrl() {
+    return this.baseUrl
+  }
+
+  async setBaseUrl(newUrl: string) {
+    this.baseUrl = newUrl
+    try {
+      await SecureStore.setItemAsync(API_BASE_OVERRIDE_KEY, newUrl)
+    } catch (err) {
+      console.warn('Failed to save API base override to secure storage', err)
+    }
+  }
+
+  async resetBaseUrl() {
+    this.baseUrl = API_BASE_URL
+    try {
+      await SecureStore.deleteItemAsync(API_BASE_OVERRIDE_KEY)
+    } catch (err) {
+      console.warn('Failed to remove API base override from secure storage', err)
     }
   }
 
@@ -135,8 +166,12 @@ class APIClient {
   }
 
   // ── Chat Endpoints ────────────────────────────────────────────────────────
-  async chat(message: string): Promise<ChatResponse> {
-    const payload: TextRequest = { text: message };
+  async chat(message: string, location?: { city?: string; address?: string }): Promise<ChatResponse> {
+    const payload: TextRequest = {
+      text: message,
+      city: location?.city,
+      address: location?.address,
+    };
     return this.fetch('/api/chat', 'POST', payload);
   }
 

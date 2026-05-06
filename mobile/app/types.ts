@@ -25,6 +25,8 @@ export interface AuthUser {
 // Chat Types
 export interface TextRequest {
   text: string;
+  city?: string;
+  address?: string;
 }
 
 export interface ChatMessage {

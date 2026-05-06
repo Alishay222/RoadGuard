@@ -10,10 +10,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import * as Location from 'expo-location';
 import { apiClient } from '@/services/api';
 import { ChatMessage } from '@/app/types';
 
 export default function ChatScreen() {
+  const [chatLocation, setChatLocation] = useState<{ city?: string; address?: string }>({});
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -26,6 +28,54 @@ export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const syncChatLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return;
+      }
+
+      const current = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+      });
+
+      const geocode = await Location.reverseGeocodeAsync({
+        latitude: current.coords.latitude,
+        longitude: current.coords.longitude,
+      });
+
+      const geo = geocode[0];
+      const city = geo?.city || geo?.subregion || geo?.region;
+
+      const addressParts = [
+        geo?.name,
+        geo?.streetNumber,
+        geo?.street,
+        geo?.district,
+        geo?.city,
+        geo?.subregion,
+        geo?.region,
+        geo?.postalCode,
+        geo?.country,
+      ].filter(Boolean);
+
+      const address = addressParts.length
+        ? Array.from(new Set(addressParts.map((part) => String(part).trim()))).join(', ')
+        : undefined;
+
+      setChatLocation({
+        city: city ? String(city) : undefined,
+        address,
+      });
+    } catch {
+      setChatLocation({});
+    }
+  };
+
+  useEffect(() => {
+    syncChatLocation();
+  }, []);
 
   const sendMessage = async (text: string = inputText) => {
     if (!text.trim()) return;
@@ -44,7 +94,7 @@ export default function ChatScreen() {
 
     try {
       // Call backend chat endpoint
-      const response = await apiClient.chat(text.trim());
+      const response = await apiClient.chat(text.trim(), chatLocation);
 
       const assistantMessage: ChatMessage = {
         id: String(Date.now() + 1),

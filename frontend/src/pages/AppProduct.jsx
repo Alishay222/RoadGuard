@@ -104,6 +104,10 @@ function getAssistantReply(message) {
     return 'If this is urgent, tap SOS immediately. I can also provide police, ambulance, and roadside helpline options.'
   }
 
+  if (normalizedMessage.includes('where am i') || normalizedMessage.includes('my location') || normalizedMessage.includes('current location') || normalizedMessage.includes('what is my location') || normalizedMessage.includes('what\'s my location') || normalizedMessage.includes('my city') || normalizedMessage.includes('current city')) {
+    return '📍 Checking your GPS location now. I can show you nearby alerts and incidents for your area.'
+  }
+
   return 'I can help with safety alerts, incidents, weather risks, and emergency actions. Tell me what is happening around you.'
 }
 

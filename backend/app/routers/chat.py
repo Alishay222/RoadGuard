@@ -62,7 +62,25 @@ def chat(request: Request, payload: TextRequest) -> dict[str, Any]:
     is_uncertain = intent in {"fallback", "ood_negative", "out_of_domain"} or confidence < 0.45
 
     # Location query
-    if any(p in text_lower for p in ["where am i", "my location", "current city", "my city", "what is my location", "what city", "which city"]):
+    if any(p in text_lower for p in [
+        "where am i",
+        "my location",
+        "your location",
+        "current location",
+        "current city",
+        "my city",
+        "what is my location",
+        "what's my location",
+        "whats my location",
+        "what is your location",
+        "what's your location",
+        "whats your location",
+        "what is your current location",
+        "what's your current location",
+        "whats your current location",
+        "what city",
+        "which city",
+    ]):
         loc = payload.address or (payload.city.title() if payload.city else "an unknown location")
         return _fill(response, f"📍 Based on your GPS, your current location is:\n{loc}", ["Show alerts near me", "Recent incidents"])
 
