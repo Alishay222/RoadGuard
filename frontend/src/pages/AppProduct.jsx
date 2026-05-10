@@ -114,7 +114,6 @@ function getAssistantReply(message) {
 export default function AppProduct() {
   const { isLoggedIn, logout, token } = useAuth()
   const [authModalOpen, setAuthModalOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
@@ -143,6 +142,7 @@ export default function AppProduct() {
   const [incidents, setIncidents] = useState([])
   const [sosContact, setSosContact] = useState(null)
   const [livePopup, setLivePopup] = useState(null)
+  const [searchInput, setSearchInput] = useState('')
   const chatMessagesRef = useRef(null)
   const chatBottomRef = useRef(null)
   const mainMapContainerRef = useRef(null)
@@ -156,6 +156,51 @@ export default function AppProduct() {
   const geoWatchIdRef = useRef(null)
   const lastGeocodeKeyRef = useRef('')
   const emergencyContactsListRef = useRef(null)
+
+  const handleLocationSearch = async (query) => {
+    if (!query.trim()) return
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=1`,
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error('Search failed')
+      }
+
+      const results = await response.json()
+
+      if (results.length > 0) {
+        const { lat, lon, display_name } = results[0]
+        const latitude = parseFloat(lat)
+        const longitude = parseFloat(lon)
+
+        setCurrentCoordinates({ latitude, longitude })
+        mainMarkerRef.current?.setLatLng([latitude, longitude])
+        miniMarkerRef.current?.setLatLng([latitude, longitude])
+        mainMapInstanceRef.current?.setView([latitude, longitude], 15)
+        miniMapInstanceRef.current?.setView([latitude, longitude], 14)
+
+        setCurrentAddress(display_name)
+        setCurrentCity(inferCityFromText(display_name))
+        setCurrentLocationUpdatedAt('Updated just now')
+      }
+    } catch (error) {
+      console.error('Location search error:', error)
+    }
+  }
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLocationSearch(searchInput)
+    }
+  }
 
   useEffect(() => {
     if (!mainMapContainerRef.current || !miniMapContainerRef.current) {
@@ -663,25 +708,10 @@ export default function AppProduct() {
         <header className="app-product__header-shell">
           <div className="app-product__topbar">
             <div className="app-product__topbar-inner">
-              <button
-                type="button"
-                className="app-product__icon-btn app-product__icon-btn--menu"
-                aria-label="Open menu"
-                aria-expanded={menuOpen}
-                onClick={() => setMenuOpen((prev) => !prev)}
-              >
-                ☰
-              </button>
-              <h1 className="app-product__title">
+              <div className="app-product__brand" aria-label="RoadGuard home">
                 <img src="/RoadGuardLogo.png" alt="RoadGuard" className="app-product__logo-img" />
-              </h1>
+              </div>
               <div className="app-product__top-actions">
-                <button type="button" className="app-product__icon-btn app-product__icon-btn--filled" aria-label="Notifications">
-                  <svg className="app-product__icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 3a4.5 4.5 0 0 0-4.5 4.5v2.15c0 .8-.24 1.58-.68 2.24L5.5 14v1.25h13V14l-1.32-2.11a4.2 4.2 0 0 1-.68-2.24V7.5A4.5 4.5 0 0 0 12 3Z" />
-                    <path d="M9.3 16.7a2.7 2.7 0 0 0 5.4 0H9.3Z" />
-                  </svg>
-                </button>
                 <button
                   type="button"
                   className="app-product__icon-btn app-product__icon-btn--filled"
@@ -697,7 +727,6 @@ export default function AppProduct() {
 
                 {profileOpen && (
                   <div className="app-product__profile-menu">
-                    <button type="button" className="app-product__profile-item" onClick={() => setProfileOpen(false)}>Profile</button>
                     <button type="button" className="app-product__profile-item" onClick={handleAuthAction}>
                       {isLoggedIn ? 'Logout' : 'Login'}
                     </button>
@@ -710,25 +739,22 @@ export default function AppProduct() {
           <div className="app-product__search-wrap">
             <div className="app-product__search-inner">
               <label htmlFor="location-search" className="sr-only">Search location</label>
-              <input id="location-search" type="text" placeholder="Search location..." className="app-product__search" />
+              <input
+                id="location-search"
+                type="text"
+                placeholder="Search location..."
+                className="app-product__search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+              />
             </div>
           </div>
         </header>
 
-        <aside className={`app-product__menu ${menuOpen ? 'app-product__menu--open' : ''}`}>
-          <button type="button" className="app-product__menu-item">Dashboard</button>
-          <button type="button" className="app-product__menu-item">Live Alerts</button>
-          <button type="button" className="app-product__menu-item">Emergency Contacts</button>
-          <button type="button" className="app-product__menu-item">Safety Reports</button>
-        </aside>
-        {menuOpen && <button type="button" className="app-product__backdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
-
         <main className="app-product__content">
           <section className="app-product__map app-product__map--large" aria-label="Main map preview">
             <div ref={mainMapContainerRef} className="app-product__leaflet-map" />
-            <div className="tag tag--safe" style={{ top: '8%', left: '2%' }}>
-              {`Live incidents: ${incidents.length}`}
-            </div>
           </section>
 
           <section className="app-product__lower-grid">

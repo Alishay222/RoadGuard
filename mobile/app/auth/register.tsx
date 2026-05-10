@@ -12,10 +12,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAuth } from '@/app/context/AuthContext';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function RegisterScreen() {
   const { register, isLoading } = useAuth();
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,7 +59,11 @@ export default function RegisterScreen() {
         email: email.trim(),
         password,
       });
-      router.replace('/(tabs)');
+      if (redirect) {
+        router.replace(decodeURIComponent(redirect) as any);
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (err: any) {
       Alert.alert(
         'Registration Failed',

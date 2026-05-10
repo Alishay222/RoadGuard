@@ -278,27 +278,18 @@ export default function DashboardScreen() {
       >
         <View style={styles.topShell}>
           <View style={styles.topBar}>
-            <TouchableOpacity style={styles.iconCircle}>
-              <Feather name="menu" size={16} color="#334155" />
-            </TouchableOpacity>
-
             <Image source={require('../../assets/images/roadguard-icon.png')} style={styles.logoIcon} />
 
             <View style={styles.topRightActions}>
-              <TouchableOpacity style={styles.iconCircle}>
-                <Ionicons name="notifications" size={15} color="#111827" />
-              </TouchableOpacity>
+              {/* notifications removed */}
               <TouchableOpacity style={styles.iconCircle} onPress={() => setProfileMenuOpen((prev) => !prev)}>
-                <Ionicons name="person" size={15} color="#111827" />
+                <Ionicons name="person" size={20} color="#111827" />
               </TouchableOpacity>
             </View>
           </View>
 
           {profileMenuOpen && (
             <View style={styles.profileMenu}>
-              <TouchableOpacity style={styles.profileItem} onPress={() => setProfileMenuOpen(false)}>
-                <Text style={styles.profileText}>Profile</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.profileItem}
                 onPress={() => {
@@ -360,9 +351,7 @@ export default function DashboardScreen() {
             onError={handleMapError}
           />
 
-          <View style={styles.mapBadgeTopLeft}>
-            <Text style={styles.mapBadgeText}>Incidents: {incidents.count}</Text>
-          </View>
+          {/* incidents count removed for cleaner UI */}
 
           <View style={styles.currentLocationPin}>
             <View style={styles.currentLocationPulse} />
@@ -382,7 +371,7 @@ export default function DashboardScreen() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.actionButton, styles.reportButton]} onPress={() => router.push('/(tabs)/incidents')}>
+        <TouchableOpacity style={[styles.actionButton, styles.reportButton]} onPress={() => router.push('/(tabs)/incidents?mode=report')}>
           <Feather name="alert-triangle" size={16} color="#ffffff" />
           <Text style={styles.actionText}>Report Incident</Text>
         </TouchableOpacity>
@@ -480,8 +469,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoIcon: {
-    width: 22,
-    height: 22,
+    width: 44,
+    height: 44,
     resizeMode: 'contain',
   },
   profileMenu: {

@@ -11,10 +11,11 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '@/app/context/AuthContext';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function LoginScreen() {
   const { login, isLoading } = useAuth();
+  const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -43,7 +44,11 @@ export default function LoginScreen() {
 
     try {
       await login({ email: email.trim(), password });
-      router.replace('/(tabs)');
+      if (redirect) {
+        router.replace(decodeURIComponent(redirect) as any);
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (err: any) {
       Alert.alert('Login Failed', err.message || 'Invalid email or password');
     }

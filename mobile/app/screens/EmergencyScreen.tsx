@@ -9,14 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 
 import { EmergencyContact } from '@/app/types';
 import { apiClient } from '@/services/api';
 
 export default function EmergencyScreen() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([]);
-  const [city, setCity] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -25,7 +23,7 @@ export default function EmergencyScreen() {
     setLoadError(null);
     try {
       setLoading(true);
-      const response = await apiClient.getEmergencyContacts(city || undefined, 300);
+      const response = await apiClient.getEmergencyContacts(undefined, 300);
       setContacts(response.items);
     } catch (err: any) {
       console.warn('Failed to load emergency contacts:', err?.message || err);
@@ -44,7 +42,7 @@ export default function EmergencyScreen() {
 
   useEffect(() => {
     loadContacts();
-  }, [city]);
+  }, []);
 
   const dial = async (phone: string) => {
     const tel = `tel:${phone}`;
@@ -75,12 +73,6 @@ export default function EmergencyScreen() {
             </TouchableOpacity>
           </View>
         )}
-        <Picker selectedValue={city} onValueChange={setCity} style={styles.picker}>
-          <Picker.Item label="All Cities" value="" />
-          <Picker.Item label="Islamabad" value="Islamabad" />
-          <Picker.Item label="Lahore" value="Lahore" />
-          <Picker.Item label="Karachi" value="Karachi" />
-        </Picker>
       </View>
 
       <FlatList
@@ -151,20 +143,20 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   errorBox: {
-    backgroundColor: '#ffe9e9',
+    backgroundColor: '#ecfdf5',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 8,
   },
   errorText: {
-    color: '#a63636',
+    color: '#065f46',
     fontSize: 12,
   },
   retryBtn: {
     alignSelf: 'flex-start',
     marginTop: 8,
-    backgroundColor: '#d64545',
+    backgroundColor: '#16a34a',
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -173,11 +165,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '700',
-  },
-  picker: {
-    height: 44,
-    backgroundColor: '#f0f2f4',
-    borderRadius: 8,
   },
   listContent: {
     padding: 12,
@@ -189,7 +176,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#d64545',
+    borderLeftColor: '#16a34a',
   },
   rowTop: {
     flexDirection: 'row',
@@ -224,7 +211,7 @@ const styles = StyleSheet.create({
   },
   callBtn: {
     alignSelf: 'flex-start',
-    backgroundColor: '#d64545',
+    backgroundColor: '#16a34a',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
