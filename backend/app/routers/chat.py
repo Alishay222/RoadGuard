@@ -26,6 +26,30 @@ SMALLTALK_TRIGGERS = [
 
 SMALLTALK_EXACT = {"ok", "okay", "alright", "sure", "yes", "yeah", "yep", "yup", "ya", "no", "nope", "nah"}
 
+EMERGENCY_KEYWORDS = ["sos", "emergency", "help", "ambulance", "police", "fire", "accident", "crash", "urgent"]
+POLICE_KEYWORDS = ["police", "15", "cop", "security", "law"]
+RESCUE_KEYWORDS = ["ambulance", "rescue", "1122", "medical", "hospital", "fire", "emergency"]
+
+
+def _is_emergency_request(text_lower: str) -> bool:
+    return any(kw in text_lower for kw in EMERGENCY_KEYWORDS)
+
+
+def _is_police_request(text_lower: str) -> bool:
+    return any(kw in text_lower for kw in POLICE_KEYWORDS)
+
+
+def _is_rescue_request(text_lower: str) -> bool:
+    return any(kw in text_lower for kw in RESCUE_KEYWORDS)
+
+
+def _emergency_contact_message(text_lower: str) -> str:
+    if _is_police_request(text_lower):
+        return "For police emergencies, call Police 15 immediately at 15."
+    if _is_rescue_request(text_lower):
+        return "For rescue or ambulance emergencies, call Rescue 1122 immediately at 1122."
+    return "For emergencies, call Rescue 1122 immediately at 1122."
+
 
 def _fill(response: dict, message: str, suggestions: list[str] | None = None,
           data_key: str | None = None, data_value: Any = None) -> dict[str, Any]:
@@ -103,6 +127,8 @@ def chat(request: Request, payload: TextRequest) -> dict[str, Any]:
         return _fill(response, r.message, r.suggestions, "quick_fix", qf)
 
     if intent in {"ask_emergency_contact", "sos_help", "find_nearby_service"}:
+        if _is_emergency_request(text_lower):
+            return _fill(response, _emergency_contact_message(text_lower), ["Call emergency services now"])
         if "alert" in text_lower or "weather" in text_lower:
             alerts = store.get_safety_alerts(city=resolved_city, limit=8)
             r = composer.compose_alerts(payload.text, intent, alerts, resolved_city)
@@ -150,6 +176,8 @@ def chat(request: Request, payload: TextRequest) -> dict[str, Any]:
             r = composer.compose_incidents(payload.text, intent, incs, resolved_city)
             return _fill(response, r.message, r.suggestions, "incidents", incs)
         if any(kw in text_lower for kw in ["sos","emergency","help","ambulance","police"]):
+            if _is_emergency_request(text_lower):
+                return _fill(response, _emergency_contact_message(text_lower), ["Call emergency services now"])
             contact = store.resolve_contact(incident_key, resolved_city)
             r = composer.compose_contact(payload.text, intent, contact, resolved_city)
             return _fill(response, r.message, r.suggestions, "contact", contact)
