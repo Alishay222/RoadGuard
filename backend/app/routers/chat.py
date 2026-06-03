@@ -63,6 +63,22 @@ def _fill(response: dict, message: str, suggestions: list[str] | None = None,
     return response
 
 
+def _finish(request: Request, payload: TextRequest, response: dict, message: str,
+            suggestions: list[str] | None = None, data_key: str | None = None,
+            data_value: Any = None) -> dict[str, Any]:
+    final_response = _fill(response, message, suggestions, data_key, data_value)
+    gemini = getattr(request.app.state, "gemini", None)
+    if gemini:
+        final_response["data"]["ai_provider"] = "local"
+        final_response["data"]["gemini"] = gemini.status()
+        enhanced = gemini.generate_reply(payload.text, final_response, payload.city)
+        if enhanced:
+            final_response["message"] = enhanced
+            final_response["data"]["ai_provider"] = "gemini"
+            final_response["data"]["gemini"] = gemini.status()
+    return final_response
+
+
 @router.post("/chat")
 def chat(request: Request, payload: TextRequest) -> dict[str, Any]:
     nlu = request.app.state.nlu
@@ -106,85 +122,85 @@ def chat(request: Request, payload: TextRequest) -> dict[str, Any]:
         "which city",
     ]):
         loc = payload.address or (payload.city.title() if payload.city else "an unknown location")
-        return _fill(response, f"📍 Based on your GPS, your current location is:\n{loc}", ["Show alerts near me", "Recent incidents"])
+        return _finish(request, payload, response, f"📍 Based on your GPS, your current location is:\n{loc}", ["Show alerts near me", "Recent incidents"])
 
     if is_smalltalk:
         st = composer.compose_smalltalk(payload.text)
-        return _fill(response, st.message, st.suggestions)
+        return _finish(request, payload, response, st.message, st.suggestions)
 
     if is_vague and intent not in {"greet", "smalltalk_bot_ready", "goodbye"}:
         c = composer.compose_clarify(resolved_city)
-        return _fill(response, c.message, c.suggestions)
+        return _finish(request, payload, response, c.message, c.suggestions)
 
     if intent in {"driver_alerts_near_me", "get_weather_alerts", "road_condition_status"}:
         alerts = store.get_safety_alerts(city=resolved_city, limit=8)
         r = composer.compose_alerts(payload.text, intent, alerts, resolved_city)
-        return _fill(response, r.message, r.suggestions, "alerts", alerts)
+        return _finish(request, payload, response, r.message, r.suggestions, "alerts", alerts)
 
     if intent in {"find_quick_tips", "how_to_fix_issue"}:
         qf = store.resolve_quick_fix(incident_key)
         r = composer.compose_quick_fix(payload.text, intent, qf)
-        return _fill(response, r.message, r.suggestions, "quick_fix", qf)
+        return _finish(request, payload, response, r.message, r.suggestions, "quick_fix", qf)
 
     if intent in {"ask_emergency_contact", "sos_help", "find_nearby_service"}:
         if _is_emergency_request(text_lower):
-            return _fill(response, _emergency_contact_message(text_lower), ["Call emergency services now"])
+            return _finish(request, payload, response, _emergency_contact_message(text_lower), ["Call emergency services now"])
         if "alert" in text_lower or "weather" in text_lower:
             alerts = store.get_safety_alerts(city=resolved_city, limit=8)
             r = composer.compose_alerts(payload.text, intent, alerts, resolved_city)
-            return _fill(response, r.message, r.suggestions, "alerts", alerts)
+            return _finish(request, payload, response, r.message, r.suggestions, "alerts", alerts)
         if "incident" in text_lower or "accident" in text_lower or "traffic" in text_lower:
             incs = store.search_incidents(payload.text, city=resolved_city, limit=5) or store.get_incidents(
                 city=resolved_city, incident_type=entities.get("incident_type"), severity=entities.get("severity"), days=30, limit=20)
             r = composer.compose_incidents(payload.text, intent, incs, resolved_city)
-            return _fill(response, r.message, r.suggestions, "incidents", incs)
+            return _finish(request, payload, response, r.message, r.suggestions, "incidents", incs)
         contact = store.resolve_contact(incident_key, resolved_city)
         r = composer.compose_contact(payload.text, intent, contact, resolved_city)
-        return _fill(response, r.message, r.suggestions, "contact", contact)
+        return _finish(request, payload, response, r.message, r.suggestions, "contact", contact)
 
     if intent == "status_query" and not any(kw in text_lower for kw in ["traffic","incident","accident","road","alert","weather","safe","route"]):
         c = composer.compose_clarify(resolved_city)
-        return _fill(response, c.message, c.suggestions)
+        return _finish(request, payload, response, c.message, c.suggestions)
 
     if intent in {"report_incident", "ask_safe_route", "ask_recent_incidents", "status_query"}:
         incs = store.search_incidents(payload.text, city=resolved_city, limit=5) or store.get_incidents(
             city=resolved_city, incident_type=entities.get("incident_type"), severity=entities.get("severity"), days=30, limit=20)
         r = composer.compose_incidents(payload.text, intent, incs, resolved_city)
-        return _fill(response, r.message, r.suggestions, "incidents", incs)
+        return _finish(request, payload, response, r.message, r.suggestions, "incidents", incs)
 
     if intent in {"greet", "smalltalk_bot_ready"}:
         g = composer.compose_greet()
-        return _fill(response, g.message, g.suggestions)
+        return _finish(request, payload, response, g.message, g.suggestions)
 
     if intent == "goodbye":
         gb = composer.compose_goodbye()
-        return _fill(response, gb.message)
+        return _finish(request, payload, response, gb.message)
 
     if intent in {"confirm", "deny", "cancel_report"}:
         c = composer.compose_clarify(resolved_city)
-        return _fill(response, c.message, c.suggestions)
+        return _finish(request, payload, response, c.message, c.suggestions)
 
     # Keyword fallback
     if is_uncertain:
         if any(kw in text_lower for kw in ["alert","weather","rain","fog","road condition"]):
             alerts = store.get_safety_alerts(city=resolved_city, limit=8)
             r = composer.compose_alerts(payload.text, intent, alerts, resolved_city)
-            return _fill(response, r.message, r.suggestions, "alerts", alerts)
+            return _finish(request, payload, response, r.message, r.suggestions, "alerts", alerts)
         if any(kw in text_lower for kw in ["incident","accident","crash","traffic"]):
             incs = store.search_incidents(payload.text, limit=5) or store.get_incidents(
                 city=resolved_city, incident_type=entities.get("incident_type"), severity=entities.get("severity"), days=30, limit=20)
             r = composer.compose_incidents(payload.text, intent, incs, resolved_city)
-            return _fill(response, r.message, r.suggestions, "incidents", incs)
+            return _finish(request, payload, response, r.message, r.suggestions, "incidents", incs)
         if any(kw in text_lower for kw in ["sos","emergency","help","ambulance","police"]):
             if _is_emergency_request(text_lower):
-                return _fill(response, _emergency_contact_message(text_lower), ["Call emergency services now"])
+                return _finish(request, payload, response, _emergency_contact_message(text_lower), ["Call emergency services now"])
             contact = store.resolve_contact(incident_key, resolved_city)
             r = composer.compose_contact(payload.text, intent, contact, resolved_city)
-            return _fill(response, r.message, r.suggestions, "contact", contact)
+            return _finish(request, payload, response, r.message, r.suggestions, "contact", contact)
         if any(kw in text_lower for kw in ["fix","tip","repair","overheat","puncher","puncture"]):
             qf = store.resolve_quick_fix(incident_key)
             r = composer.compose_quick_fix(payload.text, intent, qf)
-            return _fill(response, r.message, r.suggestions, "quick_fix", qf)
+            return _finish(request, payload, response, r.message, r.suggestions, "quick_fix", qf)
 
     c = composer.compose_clarify(resolved_city)
-    return _fill(response, c.message, c.suggestions)
+    return _finish(request, payload, response, c.message, c.suggestions)

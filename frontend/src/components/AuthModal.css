@@ -140,6 +140,49 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.auth-modal__password-wrap {
+  position: relative;
+}
+
+.auth-modal__input--password {
+  width: 100%;
+  padding-right: 2.75rem;
+}
+
+.auth-modal__password-toggle {
+  position: absolute;
+  right: 0.45rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background var(--transition), color var(--transition);
+}
+
+.auth-modal__password-toggle:hover,
+.auth-modal__password-toggle:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent);
+  outline: none;
+}
+
+.auth-modal__password-toggle svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .auth-modal__error {
   margin: 0;
   font-size: 0.82rem;

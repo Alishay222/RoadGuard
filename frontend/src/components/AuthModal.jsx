@@ -8,6 +8,7 @@ export default function AuthModal({ onClose, reason }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
@@ -111,17 +112,40 @@ export default function AuthModal({ onClose, reason }) {
 
               <div className="auth-modal__field">
                 <label htmlFor="auth-password" className="auth-modal__label">Password</label>
-                <input
-                  id="auth-password"
-                  type="password"
-                  className="auth-modal__input"
-                  placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Your password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={tab === 'signup' ? 6 : undefined}
-                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-                />
+                <div className="auth-modal__password-wrap">
+                  <input
+                    id="auth-password"
+                    type={showPassword ? 'text' : 'password'}
+                    className="auth-modal__input auth-modal__input--password"
+                    placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Your password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={tab === 'signup' ? 6 : undefined}
+                    autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+                  />
+                  <button
+                    type="button"
+                    className="auth-modal__password-toggle"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3l18 18" />
+                        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                        <path d="M9.9 5.2A9.6 9.6 0 0 1 12 5c5 0 8.5 4.2 9.7 6a13.4 13.4 0 0 1-2.3 2.8" />
+                        <path d="M6.6 6.6A13.5 13.5 0 0 0 2.3 11c1.2 1.8 4.7 6 9.7 6a9.3 9.3 0 0 0 4.1-.9" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2.3 12s3.5-6 9.7-6 9.7 6 9.7 6-3.5 6-9.7 6-9.7-6-9.7-6z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {error && <p className="auth-modal__error">{error}</p>}

@@ -24,7 +24,16 @@ This keeps routing deterministic while improving conversational quality.
 python -m pip install -r requirements.txt
 ```
 
-3. Run server from `backend` folder:
+3. Copy `.env.example` to `.env` and fill in your local values. To enable Gemini-powered chatbot responses, add:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+`GEMINI_MODEL` is optional. If `GEMINI_API_KEY` is not set, the chatbot automatically falls back to the local NLU/template response flow.
+
+4. Run server from `backend` folder:
 
 ```powershell
 # For network access (mobile app, remote clients):

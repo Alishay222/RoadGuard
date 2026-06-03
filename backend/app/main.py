@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .data_store import RoadGuardDataStore
 from .db import close_db, connect_db
+from .gemini_service import GeminiChatService
 from .nlu_service import NLUService
 from .response_service import ResponseComposer
 from .routers import auth, chat, incidents, nlu
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
     app.state.store = RoadGuardDataStore(backend_root)
     app.state.nlu = NLUService(backend_root)
     app.state.composer = ResponseComposer(backend_root)
+    app.state.gemini = GeminiChatService()
 
     app.state.nlu.load_or_train()
     await connect_db()
@@ -54,4 +56,9 @@ app.include_router(nlu.router)
 # ── Health ───────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    gemini = getattr(app.state, "gemini", None)
+    return {
+        "status": "ok",
+        "gemini_enabled": str(gemini.enabled if gemini else False).lower(),
+        "gemini_model": gemini.model if gemini else "",
+    }

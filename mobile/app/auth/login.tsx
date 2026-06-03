@@ -12,12 +12,14 @@ import {
 } from 'react-native';
 import { useAuth } from '@/app/context/AuthContext';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const { login, isLoading } = useAuth();
   const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validateForm = () => {
@@ -83,15 +85,30 @@ export default function LoginScreen() {
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
-              placeholder="••••••••"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              editable={!isLoading}
-              secureTextEntry
-            />
+            <View style={[styles.passwordInputWrap, errors.password && styles.inputError]}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="••••••••"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                editable={!isLoading}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={styles.passwordToggle}
+                onPress={() => setShowPassword((current) => !current)}
+                disabled={isLoading}
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={22}
+                  color="#666"
+                />
+              </TouchableOpacity>
+            </View>
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>
 
@@ -167,6 +184,27 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: '#ff4444',
+  },
+  passwordInputWrap: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 12,
+    paddingRight: 4,
+    fontSize: 16,
+    color: '#111',
+  },
+  passwordToggle: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
     color: '#ff4444',
