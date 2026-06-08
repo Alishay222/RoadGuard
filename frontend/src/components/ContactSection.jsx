@@ -5,17 +5,55 @@ import './ContactSection.css'
 export default function ContactSection() {
   const [ref, inView] = useInView()
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', phone: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setForm({ name: '', email: '', subject: '', message: '' })
+    setError('')
+    setLoading(true)
+    
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+      
+      // Map form fields to lead API fields
+      const leadData = {
+        name: form.name,
+        email: form.email,
+        message: form.message,
+        phone: form.phone || undefined,
+      }
+      
+      const response = await fetch(`${API_BASE_URL}/api/leads`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leadData),
+      })
+
+      if (response.ok) {
+        setSubmitted(true)
+        setForm({ name: '', email: '', subject: '', message: '', phone: '' })
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => setSubmitted(false), 5000)
+      } else {
+        const data = await response.json()
+        setError(data.detail || 'Failed to submit form. Please try again.')
+      }
+    } catch (err) {
+      console.error('Contact form error:', err)
+      setError('Network error. Please check your connection and try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -31,7 +69,13 @@ export default function ContactSection() {
           <div className="contact-section__success">
             <p>Thanks for reaching out. We’ll get back to you soon.</p>
           </div>
-        ) : (
+        ) : error ? (
+          <div style={{ color: '#dc2626', marginBottom: '20px', padding: '12px', borderRadius: '6px', backgroundColor: '#fee' }}>
+            <p>{error}</p>
+          </div>
+        ) : null}
+        
+        {!submitted && (
           <form className="contact-section__form" onSubmit={handleSubmit}>
             <div className="contact-section__row">
               <label htmlFor="contact-name" className="contact-section__label">Name</label>
@@ -84,8 +128,8 @@ export default function ContactSection() {
                 required
               />
             </div>
-            <button type="submit" className="contact-section__submit">
-              Send message
+            <button type="submit" className="contact-section__submit" disabled={loading}>
+              {loading ? 'Sending...' : 'Send message'}
             </button>
           </form>
         )}
