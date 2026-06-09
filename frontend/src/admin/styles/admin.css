@@ -494,6 +494,52 @@
   cursor: not-allowed;
 }
 
+/* ──────────────────────────────────────────────────────────────────────── */
+/* ANIMATIONS */
+/* ──────────────────────────────────────────────────────────────────────── */
+
+@keyframes adminFadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-content {
+  animation: adminFadeInUp 0.4s ease-out forwards;
+}
+
+.admin-stat-card {
+  opacity: 0;
+  animation: adminFadeInUp 0.4s ease-out forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-stat-card:nth-child(1) { animation-delay: 0.05s; }
+.admin-stat-card:nth-child(2) { animation-delay: 0.1s; }
+.admin-stat-card:nth-child(3) { animation-delay: 0.15s; }
+.admin-stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+.admin-table tbody tr {
+  opacity: 0;
+  animation: adminFadeInUp 0.3s ease-out forwards;
+}
+.admin-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+.admin-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+.admin-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+.admin-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+.admin-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+.admin-table tbody tr:nth-child(n+6) { animation-delay: 0.3s; }
+
+.admin-chart-card {
+  opacity: 0;
+  animation: adminFadeInUp 0.5s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
 @media (max-width: 768px) {
   .admin-header__toggle {
     display: block;

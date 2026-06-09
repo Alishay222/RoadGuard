@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useAdmin } from '../context/AdminContext'
+import { IconUser } from '../../components/Icons'
 import '../styles/admin.css'
 
 export default function AdminHeader({ title }) {
@@ -52,7 +53,7 @@ export default function AdminHeader({ title }) {
               aria-expanded={menuOpen}
               aria-label="Admin profile menu"
             >
-              <span className="admin-user-menu__icon">👤</span>
+              <IconUser />
             </button>
             {menuOpen && (
               <div className="admin-user-menu__dropdown">
