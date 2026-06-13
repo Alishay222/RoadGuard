@@ -39,9 +39,18 @@ async def register(payload: RegisterRequest) -> TokenResponse:
     try:
         user_doc = {
             "email": email_key,
-            "name": payload.name.strip(),
+            "name": payload.name.strip() if payload.name else "",
+            "phone": payload.phone or "",
+            "city": payload.city or "",
+            "vehicle_type": payload.vehicle_type or "",
+            "license_plate": payload.license_plate or "",
+            "driving_experience": payload.driving_experience or "",
+            "emergency_contact_name": payload.emergency_contact_name or "",
+            "emergency_contact_phone": payload.emergency_contact_phone or "",
+            "language_preference": "English",
             "hashed_password": hash_password(payload.password),
             "created_at": datetime.now(UTC),
+            "is_admin": False,
         }
         await db.users.insert_one(user_doc)
     except Exception as exc:
@@ -51,7 +60,7 @@ async def register(payload: RegisterRequest) -> TokenResponse:
         )
 
     token = create_token(email_key)
-    return TokenResponse(access_token=token, email=email_key, name=payload.name.strip())
+    return TokenResponse(access_token=token, email=email_key, name=payload.name.strip() if payload.name else "")
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -78,6 +87,13 @@ async def login(payload: LoginRequest) -> TokenResponse:
             detail="Incorrect email or password.",
         )
 
+    # Check if user is active
+    if user.get("is_active") == False:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your account has been deactivated. Please contact support.",
+        )
+
     try:
         is_valid = verify_password(payload.password, user["hashed_password"])
     except Exception as exc:
@@ -91,6 +107,15 @@ async def login(payload: LoginRequest) -> TokenResponse:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password.",
         )
+
+    # Update last_login timestamp
+    try:
+        await db.users.update_one(
+            {"email": email_key},
+            {"$set": {"last_login": datetime.now(UTC)}}
+        )
+    except Exception as exc:
+        print(f"Failed to update last_login: {exc}")
 
     token = create_token(email_key)
     return TokenResponse(access_token=token, email=email_key, name=user.get("name", ""))

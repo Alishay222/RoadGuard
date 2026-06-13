@@ -2,16 +2,29 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import './AuthModal.css'
 
-export default function AuthModal({ onClose, reason }) {
+export default function AuthModal({ onClose, reason, disableClose = false }) {
   const { login, register } = useAuth()
   const [tab, setTab] = useState('login')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    city: '',
+    vehicle_type: '',
+    license_plate: '',
+    driving_experience: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
+  })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -19,10 +32,11 @@ export default function AuthModal({ onClose, reason }) {
     setLoading(true)
     try {
       if (tab === 'login') {
-        await login(email, password)
+        await login(formData.email, formData.password)
         setSuccessMsg('Signed in successfully! 👋')
       } else {
-        await register(email, password, name)
+        // For signup, pass the entire formData
+        await register(formData)
         setSuccessMsg('Registered successfully! 🎉')
       }
       setTimeout(onClose, 1500)
@@ -35,7 +49,6 @@ export default function AuthModal({ onClose, reason }) {
 
   return (
     <div className="auth-modal-overlay" role="dialog" aria-label="Sign in to RoadGuard" aria-modal="true">
-      <div className="auth-modal-backdrop" onClick={successMsg ? undefined : onClose} />
       <div className="auth-modal">
 
         {successMsg ? (
@@ -55,7 +68,9 @@ export default function AuthModal({ onClose, reason }) {
         ) : (
           /* ── Auth form ──────────────────────────────────────────────── */
           <>
-            <button className="auth-modal__close" aria-label="Close" onClick={onClose}>×</button>
+            {!disableClose && (
+              <button className="auth-modal__close" aria-label="Close" onClick={onClose}>×</button>
+            )}
 
             {reason && <p className="auth-modal__reason">{reason}</p>}
 
@@ -81,30 +96,17 @@ export default function AuthModal({ onClose, reason }) {
             </div>
 
             <form className="auth-modal__form" onSubmit={handleSubmit} noValidate>
-              {tab === 'signup' && (
-                <div className="auth-modal__field">
-                  <label htmlFor="auth-name" className="auth-modal__label">Name</label>
-                  <input
-                    id="auth-name"
-                    type="text"
-                    className="auth-modal__input"
-                    placeholder="Your name (optional)"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    autoComplete="name"
-                  />
-                </div>
-              )}
-
+              {/* Login/Signup Common Fields */}
               <div className="auth-modal__field">
                 <label htmlFor="auth-email" className="auth-modal__label">Email</label>
                 <input
                   id="auth-email"
                   type="email"
+                  name="email"
                   className="auth-modal__input"
                   placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                   autoComplete="email"
                 />
@@ -112,41 +114,157 @@ export default function AuthModal({ onClose, reason }) {
 
               <div className="auth-modal__field">
                 <label htmlFor="auth-password" className="auth-modal__label">Password</label>
-                <div className="auth-modal__password-wrap">
-                  <input
-                    id="auth-password"
-                    type={showPassword ? 'text' : 'password'}
-                    className="auth-modal__input auth-modal__input--password"
-                    placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Your password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={tab === 'signup' ? 6 : undefined}
-                    autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-                  />
-                  <button
-                    type="button"
-                    className="auth-modal__password-toggle"
-                    onClick={() => setShowPassword((current) => !current)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    title={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M3 3l18 18" />
-                        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
-                        <path d="M9.9 5.2A9.6 9.6 0 0 1 12 5c5 0 8.5 4.2 9.7 6a13.4 13.4 0 0 1-2.3 2.8" />
-                        <path d="M6.6 6.6A13.5 13.5 0 0 0 2.3 11c1.2 1.8 4.7 6 9.7 6a9.3 9.3 0 0 0 4.1-.9" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M2.3 12s3.5-6 9.7-6 9.7 6 9.7 6-3.5 6-9.7 6-9.7-6-9.7-6z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                <input
+                  id="auth-password"
+                  type="password"
+                  name="password"
+                  className="auth-modal__input"
+                  placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Your password'}
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  minLength={tab === 'signup' ? 6 : undefined}
+                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
+                />
               </div>
+
+              {/* Signup-only Fields (10 total fields) */}
+              {tab === 'signup' && (
+                <>
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-name" className="auth-modal__label">Full Name *</label>
+                    <input
+                      id="auth-name"
+                      type="text"
+                      name="name"
+                      className="auth-modal__input"
+                      placeholder="Your full name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      autoComplete="name"
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-phone" className="auth-modal__label">Phone Number *</label>
+                    <input
+                      id="auth-phone"
+                      type="tel"
+                      name="phone"
+                      className="auth-modal__input"
+                      placeholder="+92 300 1234567"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      autoComplete="tel"
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-city" className="auth-modal__label">City *</label>
+                    <select
+                      id="auth-city"
+                      name="city"
+                      className="auth-modal__input"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Select City</option>
+                      <option value="Islamabad">Islamabad</option>
+                      <option value="Karachi">Karachi</option>
+                      <option value="Lahore">Lahore</option>
+                      <option value="Rawalpindi">Rawalpindi</option>
+                      <option value="Peshawar">Peshawar</option>
+                      <option value="Multan">Multan</option>
+                      <option value="Faisalabad">Faisalabad</option>
+                      <option value="Quetta">Quetta</option>
+                    </select>
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-vehicle" className="auth-modal__label">Vehicle Type *</label>
+                    <select
+                      id="auth-vehicle"
+                      name="vehicle_type"
+                      className="auth-modal__input"
+                      value={formData.vehicle_type}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Select Vehicle Type</option>
+                      <option value="Car">Car</option>
+                      <option value="Motorcycle">Motorcycle</option>
+                      <option value="Bus">Bus</option>
+                      <option value="Truck">Truck</option>
+                      <option value="Taxi">Taxi</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-plate" className="auth-modal__label">License Plate *</label>
+                    <input
+                      id="auth-plate"
+                      type="text"
+                      name="license_plate"
+                      className="auth-modal__input"
+                      placeholder="ABC-1234"
+                      value={formData.license_plate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-experience" className="auth-modal__label">Driving Experience *</label>
+                    <select
+                      id="auth-experience"
+                      name="driving_experience"
+                      className="auth-modal__input"
+                      value={formData.driving_experience}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Select Experience</option>
+                      <option value="0-1 years">0-1 years</option>
+                      <option value="1-3 years">1-3 years</option>
+                      <option value="3-5 years">3-5 years</option>
+                      <option value="5-10 years">5-10 years</option>
+                      <option value="10+ years">10+ years</option>
+                    </select>
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-emergency-name" className="auth-modal__label">Emergency Contact Name *</label>
+                    <input
+                      id="auth-emergency-name"
+                      type="text"
+                      name="emergency_contact_name"
+                      className="auth-modal__input"
+                      placeholder="Contact person name"
+                      value={formData.emergency_contact_name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-emergency-phone" className="auth-modal__label">Emergency Contact Phone *</label>
+                    <input
+                      id="auth-emergency-phone"
+                      type="tel"
+                      name="emergency_contact_phone"
+                      className="auth-modal__input"
+                      placeholder="+92 300 1234567"
+                      value={formData.emergency_contact_phone}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </>
+              )}
 
               {error && <p className="auth-modal__error">{error}</p>}
 

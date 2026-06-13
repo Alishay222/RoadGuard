@@ -11,7 +11,7 @@ from .db import close_db, connect_db
 from .gemini_service import GeminiChatService
 from .nlu_service import NLUService
 from .response_service import ResponseComposer
-from .routers import auth, chat, incidents, nlu
+from .routers import auth, chat, incidents, nlu, admin
 
 backend_root = Path(__file__).resolve().parents[1]
 
@@ -51,6 +51,7 @@ app.include_router(auth.router)
 app.include_router(incidents.router)
 app.include_router(chat.router)
 app.include_router(nlu.router)
+app.include_router(admin.router)
 
 
 # ── Health ───────────────────────────────────────────────────────────────────

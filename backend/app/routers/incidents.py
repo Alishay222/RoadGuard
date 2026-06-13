@@ -61,9 +61,38 @@ def get_quick_fix(request: Request, incident_key: str) -> dict[str, Any]:
 
 
 @router.post("/api/contact")
-def get_contact(request: Request, payload: IncidentRequest) -> dict[str, Any]:
+async def submit_contact_form(payload: dict) -> dict[str, Any]:
+    """Save contact form submission to database."""
+    db = get_db()
+    if db is None:
+        # Fallback: just acknowledge without DB
+        return {"status": "received", "message": "Thank you for contacting us. We will get back to you soon."}
+    
+    try:
+        contact_doc = {
+            "name": payload.get("name", ""),
+            "email": payload.get("email", ""),
+            "subject": payload.get("subject", ""),
+            "message": payload.get("message", ""),
+            "created_at": datetime.now(UTC),
+            "status": "new",
+        }
+        result = await db.contact_submissions.insert_one(contact_doc)
+        return {
+            "status": "success",
+            "message": "Thank you for contacting us. We will get back to you soon.",
+            "id": str(result.inserted_id),
+        }
+    except Exception as exc:
+        print(f"Failed to save contact submission: {exc}")
+        return {"status": "received", "message": "Thank you for contacting us. We will get back to you soon."}
+
+
+@router.get("/api/contact")
+def get_contact(request: Request, incident_key: str = "", city: str = "") -> dict[str, Any]:
+    """Get emergency contact information for an incident."""
     store = request.app.state.store
-    result = store.resolve_contact(payload.incident_key, payload.city)
+    result = store.resolve_contact(incident_key, city)
     if not result:
         raise HTTPException(status_code=404, detail="No contact found for incident key")
     return result

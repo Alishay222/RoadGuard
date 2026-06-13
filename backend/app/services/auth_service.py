@@ -63,7 +63,18 @@ async def get_current_user(
     user = await get_user_by_email(email)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found.")
-    return {"email": user["email"], "name": user.get("name", "")}
+    return {
+        "email": user["email"],
+        "name": user.get("name", ""),
+        "phone": user.get("phone", ""),
+        "city": user.get("city", ""),
+        "vehicle_type": user.get("vehicle_type", ""),
+        "license_plate": user.get("license_plate", ""),
+        "driving_experience": user.get("driving_experience", ""),
+        "emergency_contact_name": user.get("emergency_contact_name", ""),
+        "emergency_contact_phone": user.get("emergency_contact_phone", ""),
+        "is_admin": user.get("is_admin", False),
+    }
 
 
 async def get_current_user_optional(

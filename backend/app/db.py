@@ -4,12 +4,13 @@ import hashlib
 import json
 import os
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-load_dotenv(override=True)
+load_dotenv(Path(__file__).resolve().parents[1] / '.env', override=True)
 
 _client: AsyncIOMotorClient | None = None
 _db: AsyncIOMotorDatabase | None = None
