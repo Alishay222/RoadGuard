@@ -461,6 +461,7 @@
 
 .card--location {
   background: var(--bg-elevated);
+  grid-column: 1 / -1;
   min-height: 84px;
   transition: background var(--transition);
 }
@@ -636,7 +637,7 @@
   border-radius: 10px;
   background: #ffffff;
   display: grid;
-  grid-template-rows: 1fr auto auto;
+  grid-template-rows: 1fr auto;
   overflow: hidden;
   flex: 1;
   min-height: 0;
@@ -1142,7 +1143,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  display: grid;
+  display: none;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
   background: #d4e6dd;
@@ -1150,6 +1151,12 @@
   z-index: 80;
   padding: 6px 6px;
   height: 60px;
+}
+
+@media (max-width: 600px) {
+  .app-product__bottom-tabs {
+    display: grid;
+  }
 }
 
 .app-product__tab-btn {

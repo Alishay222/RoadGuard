@@ -799,6 +799,14 @@ export default function AppProduct() {
           </section>
 
           <section className="app-product__lower-grid">
+            <article className="card card--location">
+              <div className="card__title-row">
+                <h2 className="card__title">Current Location</h2>
+                <p className="card__location-meta">{currentLocationUpdatedAt}</p>
+              </div>
+              <p className="card__location-text">{currentAddress}</p>
+            </article>
+
             <div className="app-product__left-half">
               <div className="app-product__actions">
                 <button
@@ -844,13 +852,6 @@ export default function AppProduct() {
                 <div ref={miniMapContainerRef} className="app-product__leaflet-map" />
                 <div className="tag tag--safe" style={{ top: '8%', left: '4%' }}>{currentCity}</div>
               </section>
-              <article className="card card--location">
-                <div className="card__title-row">
-                  <h2 className="card__title">Current Location</h2>
-                  <p className="card__location-meta">{currentLocationUpdatedAt}</p>
-                </div>
-                <p className="card__location-text">{currentAddress}</p>
-              </article>
               <article className="card card--alerts">
                 <h2 className="card__title card__title--warning">⚠ Safety Alerts:</h2>
                 <div style={{ overflow: 'hidden', maxHeight: '140px', position: 'relative', maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)' }}>
