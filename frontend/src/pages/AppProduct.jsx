@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './AppProduct.css'
@@ -112,10 +113,13 @@ function getAssistantReply(message) {
 }
 
 export default function AppProduct() {
+  const navigate = useNavigate()
   const { isLoggedIn, logout, token } = useAuth()
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
+  const [contactsOpen, setContactsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('home') // 'home' | 'chat' | 'report' | 'contacts'
   const [reportOpen, setReportOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
   const [reportSubmitting, setReportSubmitting] = useState(false)
@@ -622,6 +626,7 @@ export default function AppProduct() {
       location: '',
       details: '',
     })
+    setActiveTab('home')
   }
 
   const handleAuthAction = () => {
@@ -682,6 +687,35 @@ export default function AppProduct() {
     }
   }
 
+  const handleSelectTab = (tab) => {
+    setActiveTab(tab)
+    setContactsOpen(false)
+    if (tab === 'home') {
+      setChatOpen(false)
+      setReportOpen(false)
+    }
+
+    if (tab === 'chat') {
+      setChatOpen(true)
+      setReportOpen(false)
+    }
+
+    if (tab === 'report') {
+      if (isLoggedIn) {
+        setReportOpen(true)
+      } else {
+        setAuthModalOpen(true)
+      }
+      setChatOpen(false)
+    }
+
+    if (tab === 'contacts') {
+      setContactsOpen(true)
+      setChatOpen(false)
+      setReportOpen(false)
+    }
+  }
+
   return (
     <div className="app-product" aria-label="Traffic Safety & Alert app screen">
       {authModalOpen && (
@@ -704,13 +738,20 @@ export default function AppProduct() {
           </button>
         </div>
       )}
-      <div className="app-product__phone">
-        <header className="app-product__header-shell">
+      <div className={`app-product__phone ${activeTab === 'home' ? '' : 'is-tab-active'}`}>
+        <div className={`app-product__main-wrapper ${activeTab === 'home' ? '' : 'is-hidden'}`}>
+          <header className="app-product__header-shell">
           <div className="app-product__topbar">
             <div className="app-product__topbar-inner">
-              <div className="app-product__brand" aria-label="RoadGuard home">
+              <button
+                type="button"
+                className="app-product__brand"
+                aria-label="RoadGuard home"
+                onClick={() => navigate('/')}
+                style={{ border: 'none', background: 'transparent', padding: 0, cursor: 'pointer' }}
+              >
                 <img src="/RoadGuardLogo.png" alt="RoadGuard" className="app-product__logo-img" />
-              </div>
+              </button>
               <div className="app-product__top-actions">
                 <button
                   type="button"
@@ -750,9 +791,9 @@ export default function AppProduct() {
               />
             </div>
           </div>
-        </header>
+          </header>
 
-        <main className="app-product__content">
+          <main className="app-product__content">
           <section className="app-product__map app-product__map--large" aria-label="Main map preview">
             <div ref={mainMapContainerRef} className="app-product__leaflet-map" />
           </section>
@@ -823,21 +864,21 @@ export default function AppProduct() {
               </div>
             </div>
           </section>
-        </main>
+          </main>
+        </div>
 
         {reportOpen && (
-          <div className="app-product__report-overlay" role="dialog" aria-label="Report Incident form">
+          <div className={`app-product__report-overlay ${activeTab === 'report' ? 'is-fullscreen' : ''}`} role="dialog" aria-label="Report Incident form">
             <div className="app-product__report-backdrop" onClick={handleCloseReport} />
-            <div className="app-product__report-modal">
+            <div className={`app-product__report-modal ${activeTab === 'report' ? 'is-fullscreen' : ''}`}>
               <div className="app-product__report-header">
                 <h3>Report Incident</h3>
-                <button type="button" className="app-product__report-close" aria-label="Close report form" onClick={handleCloseReport}>×</button>
               </div>
 
               {reportSubmitted ? (
                 <div className="app-product__report-success">
                   <p>Your incident report has been submitted successfully.</p>
-                  <button type="button" className="app-product__report-submit" onClick={handleCloseReport}>Done</button>
+                  <button type="button" className="app-product__report-submit app-product__report-submit--compact" onClick={handleCloseReport}>Done</button>
                 </div>
               ) : (
                 <form className="app-product__report-form" onSubmit={handleReportSubmit}>
@@ -885,7 +926,7 @@ export default function AppProduct() {
                     </p>
                   )}
 
-                  <button type="submit" className="app-product__report-submit" disabled={reportSubmitting}>
+                  <button type="submit" className="app-product__report-submit app-product__report-submit--compact" disabled={reportSubmitting}>
                     {reportSubmitting ? 'Submitting...' : 'Submit'}
                   </button>
                 </form>
@@ -896,7 +937,7 @@ export default function AppProduct() {
 
         <div className="app-product__chat">
           {chatOpen && (
-            <div className="app-product__chat-panel" role="dialog" aria-label="Chat assistant">
+            <div className={`app-product__chat-panel ${activeTab === 'chat' ? 'is-fullscreen' : ''}`} role="dialog" aria-label="Chat assistant">
               <div className="app-product__chat-header">
                 <strong>RoadGuard Assistant</strong>
               </div>
@@ -958,14 +999,7 @@ export default function AppProduct() {
                 </button>
               </div>
 
-              <button
-                type="button"
-                className="app-product__chat-close"
-                aria-label="Close chatbot"
-                onClick={() => setChatOpen(false)}
-              >
-                ×
-              </button>
+
             </div>
           )}
 
@@ -984,6 +1018,76 @@ export default function AppProduct() {
             </button>
           </div>
         </div>
+        {/* Bottom tabs for mobile */}
+        <nav className="app-product__bottom-tabs" aria-label="Primary mobile navigation">
+          <button
+            type="button"
+            className={`app-product__tab-btn ${activeTab === 'home' ? 'is-active' : ''}`}
+            onClick={() => handleSelectTab('home')}
+            aria-label="Home"
+          >
+            🏠
+            <span className="app-product__tab-label">Home</span>
+          </button>
+
+          <button
+            type="button"
+            className={`app-product__tab-btn ${activeTab === 'chat' ? 'is-active' : ''}`}
+            onClick={() => handleSelectTab('chat')}
+            aria-label="Chat"
+          >
+            💬
+            <span className="app-product__tab-label">Chat</span>
+          </button>
+
+          <button
+            type="button"
+            className={`app-product__tab-btn ${activeTab === 'report' ? 'is-active' : ''}`}
+            onClick={() => handleSelectTab('report')}
+            aria-label="Report"
+          >
+            ❗
+            <span className="app-product__tab-label">Report</span>
+          </button>
+
+          <button
+            type="button"
+            className={`app-product__tab-btn ${activeTab === 'contacts' ? 'is-active' : ''}`}
+            onClick={() => handleSelectTab('contacts')}
+            aria-label="Contacts"
+          >
+            📞
+            <span className="app-product__tab-label">Contacts</span>
+          </button>
+        </nav>
+
+        {/* Contacts slide-up panel */}
+        {contactsOpen && (
+          <div className={`app-product__contacts-panel ${activeTab === 'contacts' ? 'is-fullscreen' : ''}`} role="dialog" aria-label="Emergency contacts">
+            <div className="app-product__contacts-backdrop" onClick={() => setContactsOpen(false)} />
+            <div className="app-product__contacts-inner">
+              <div className="app-product__contacts-header">
+                <strong>Emergency Contacts</strong>
+              </div>
+              <ul className="app-product__contacts-list">
+                {sosContact && (
+                  <li>
+                    <span>{sosContact.service || 'SOS Contact'}</span>
+                    <strong>{sosContact.phone_number}</strong>
+                    <a href={`tel:${sosContact.phone_number}`}>📞</a>
+                  </li>
+                )}
+                <li><span>Police</span><strong>15</strong><a href="tel:15">📞</a></li>
+                <li><span>Ambulance</span><strong>1122</strong><a href="tel:1122">📞</a></li>
+                <li><span>Roadside Help</span><strong>130</strong><a href="tel:130">📞</a></li>
+                <li><span>Traffic Police</span><strong>1915</strong><a href="tel:1915">📞</a></li>
+                <li><span>Fire Brigade</span><strong>16</strong><a href="tel:16">📞</a></li>
+                <li><span>Rescue Helpline</span><strong>1122</strong><a href="tel:1122">📞</a></li>
+                <li><span>Highway Patrol</span><strong>130</strong><a href="tel:130">📞</a></li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

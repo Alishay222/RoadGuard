@@ -123,6 +123,14 @@
 }
 
 @media (max-width: 768px) {
+  .header__inner {
+    padding: 0.8rem 1rem;
+  }
+
+  .header__logo-img {
+    height: 56px;
+  }
+
   .header__nav {
     position: absolute;
     top: 100%;
@@ -147,5 +155,33 @@
 
   .header__menu-btn {
     display: flex;
+  }
+
+  .header__cta {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .header__actions {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header__inner {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .header__logo-img {
+    height: 44px;
+  }
+
+  .header__logo-text {
+    font-size: 1rem;
+  }
+
+  .header__cta {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
   }
 }

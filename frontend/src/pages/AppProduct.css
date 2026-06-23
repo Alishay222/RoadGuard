@@ -44,8 +44,9 @@
   width: 100%;
   background: var(--bg-header);
   color: var(--text-header);
-  position: relative;
-  z-index: 20;
+  position: sticky;
+  top: 0;
+  z-index: 70;
   border-bottom: 1px solid var(--border);
   padding: clamp(0.5rem, 0.7vh, 0.55rem) clamp(0.9rem, 1.8vw, 1.6rem) clamp(0.9rem, 1.6vh, 1.2rem);
   box-shadow: var(--shadow);
@@ -196,6 +197,127 @@
   background: var(--bg-dashboard);
   overflow: hidden;
   transition: background var(--transition);
+}
+
+/* Wrapper used to hide or blur the main UI when another tab is active */
+.app-product__main-wrapper {
+  transition: filter 220ms ease, opacity 220ms ease;
+}
+
+.app-product__main-wrapper.is-hidden {
+  opacity: 0.04;
+  filter: blur(8px) saturate(0.6) grayscale(0.2);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Ensure overlays appear above the blurred background */
+.app-product__chat-panel,
+.app-product__report-overlay,
+.app-product__contacts-panel,
+.app-product__live-popup,
+.app-product__bottom-tabs {
+  z-index: 999;
+}
+
+/* When a tab is active, make the phone area fill viewport and prevent background scrolling */
+.app-product__phone.is-tab-active {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Fullscreen chat */
+.app-product__chat-panel.is-fullscreen {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 60px;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  border-radius: 0;
+  padding: 0.6rem;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 75;
+}
+
+.app-product__chat-panel.is-fullscreen .app-product__chat-messages {
+  padding: 0.6rem;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* Fullscreen report modal */
+.app-product__report-overlay.is-fullscreen {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 60px;
+  z-index: 75;
+  display: grid;
+  place-items: center;
+}
+
+.app-product__report-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+}
+
+.app-product__report-overlay.is-fullscreen .app-product__report-backdrop {
+  display: none;
+}
+
+.app-product__report-modal.is-fullscreen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  padding: 1rem 1.2rem;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: auto;
+}
+
+.app-product__report-modal.is-fullscreen .app-product__report-form,
+.app-product__report-modal.is-fullscreen .app-product__report-success {
+  overflow: auto;
+  max-height: 100%;
+}
+
+/* Fullscreen contacts panel */
+.app-product__contacts-panel.is-fullscreen {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 60px;
+  z-index: 75;
+  display: grid;
+  place-items: center;
+}
+
+.app-product__contacts-panel.is-fullscreen .app-product__contacts-backdrop {
+  display: none;
+}
+
+.app-product__contacts-inner {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 0;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.app-product__contacts-list {
+  overflow: auto;
+  max-height: 100%;
 }
 
 .app-product__map {
@@ -544,9 +666,9 @@
   border-radius: 12px;
   background: var(--bg-elevated);
   box-shadow: var(--shadow-hover);
-  padding: 0.85rem;
+  padding: 1.2rem 0.85rem;
   display: grid;
-  gap: 0.7rem;
+  gap: 0.55rem;
 }
 
 .app-product__report-header {
@@ -554,6 +676,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
+  padding: 0 0.8rem;
 }
 
 .app-product__report-header h3 {
@@ -563,19 +686,13 @@
 }
 
 .app-product__report-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(148, 163, 184, 0.16);
-  color: var(--text);
-  font-size: 1rem;
-  line-height: 1;
+  display: none;
 }
 
 .app-product__report-form {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  padding: 0 0.8rem;
 }
 
 .app-product__report-label {
@@ -589,14 +706,14 @@
   border-radius: 8px;
   background: var(--bg-warm);
   color: var(--text);
-  padding: 0.48rem 0.58rem;
+  padding: 0.4rem 0.48rem;
   font-size: clamp(0.72rem, 0.96vw, 0.9rem);
   transition: all var(--transition);
 }
 
 .app-product__report-textarea {
   resize: vertical;
-  min-height: 96px;
+  min-height: 80px;
 }
 
 .app-product__report-submit {
@@ -610,10 +727,20 @@
   font-size: clamp(0.74rem, 0.98vw, 0.9rem);
 }
 
+.app-product__report-submit--compact {
+  margin-top: 0.2rem;
+  padding: 0.38rem 0.62rem;
+  font-size: 0.8rem;
+  min-height: 36px;
+  height: 36px;
+  line-height: 1;
+}
+
 .app-product__report-success {
   display: grid;
   gap: 0.6rem;
   color: var(--text);
+  padding: 0 0.8rem;
 }
 
 .app-product__report-success p {
@@ -788,6 +915,10 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.4rem;
+  padding-bottom: 0.6rem;
+  position: relative;
+  z-index: 76;
+  background: var(--bg-elevated);
 }
 
 .app-product__chat-input {
@@ -830,17 +961,7 @@
 }
 
 .app-product__chat-close {
-  position: absolute;
-  top: 0.3rem;
-  right: 0.3rem;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  border: 0;
-  background: rgba(148, 163, 184, 0.2);
-  color: var(--text);
-  font-size: 1rem;
-  line-height: 1;
+  display: none;
 }
 
 .app-product__map--small {
@@ -1013,6 +1134,99 @@
   .app-product__live-popup-close {
     font-size: 1.25rem;
   }
+}
+
+/* Bottom tab bar (mobile) */
+.app-product__bottom-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  background: #d4e6dd;
+  border-top: 1px solid var(--border);
+  z-index: 80;
+  padding: 6px 6px;
+  height: 60px;
+}
+
+.app-product__tab-btn {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.app-product__tab-btn .app-product__tab-label {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.app-product__tab-btn.is-active {
+  color: var(--accent);
+}
+
+/* Contacts panel */
+.app-product__contacts-panel {
+  position: fixed;
+  inset: auto 0 58px 0; /* leave space for bottom tabs */
+  z-index: 70;
+  display: grid;
+  place-items: end;
+}
+
+.app-product__contacts-backdrop {
+  position: fixed;
+  inset: 0 0 58px 0;
+  background: rgba(0,0,0,0.3);
+}
+
+.app-product__contacts-inner {
+  width: 100%;
+  max-height: 60vh;
+  background: var(--bg-elevated);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.18);
+  padding: 10px 12px 18px;
+  overflow: auto;
+}
+
+.app-product__contacts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.app-product__contacts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.app-product__contacts-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--bg-warm);
+}
+
+.app-product__contacts-close {
+  display: none;
 }
 
 /* Global popup styles */
