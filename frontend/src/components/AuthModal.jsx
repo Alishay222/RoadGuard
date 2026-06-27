@@ -96,54 +96,43 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
             </div>
 
             <form className="auth-modal__form" onSubmit={handleSubmit} noValidate>
-              {/* Login/Signup Common Fields */}
-              <div className="auth-modal__field">
-                <label htmlFor="auth-email" className="auth-modal__label">Email</label>
-                <input
-                  id="auth-email"
-                  type="email"
-                  name="email"
-                  className="auth-modal__input"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div className="auth-modal__field">
-                <label htmlFor="auth-password" className="auth-modal__label">Password</label>
-                <input
-                  id="auth-password"
-                  type="password"
-                  name="password"
-                  className="auth-modal__input"
-                  placeholder={tab === 'signup' ? 'Minimum 6 characters' : 'Your password'}
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  minLength={tab === 'signup' ? 6 : undefined}
-                  autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
-                />
-              </div>
-
-              {/* Signup-only Fields (10 total fields) */}
-              {tab === 'signup' && (
+              {tab === 'signup' ? (
                 <>
                   <div className="auth-modal__field">
-                    <label htmlFor="auth-name" className="auth-modal__label">Full Name *</label>
+                    <label htmlFor="auth-name" className="auth-modal__label">First Name *</label>
                     <input
                       id="auth-name"
                       type="text"
                       name="name"
                       className="auth-modal__input"
-                      placeholder="Your full name"
+                      placeholder="Your first name"
                       value={formData.name}
                       onChange={handleInputChange}
                       required
                       autoComplete="name"
                     />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-city" className="auth-modal__label">Location *</label>
+                    <select
+                      id="auth-city"
+                      name="city"
+                      className="auth-modal__input"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="">Select Location</option>
+                      <option value="Islamabad">Islamabad</option>
+                      <option value="Karachi">Karachi</option>
+                      <option value="Lahore">Lahore</option>
+                      <option value="Rawalpindi">Rawalpindi</option>
+                      <option value="Peshawar">Peshawar</option>
+                      <option value="Multan">Multan</option>
+                      <option value="Faisalabad">Faisalabad</option>
+                      <option value="Quetta">Quetta</option>
+                    </select>
                   </div>
 
                   <div className="auth-modal__field">
@@ -162,25 +151,62 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
                   </div>
 
                   <div className="auth-modal__field">
-                    <label htmlFor="auth-city" className="auth-modal__label">City *</label>
-                    <select
-                      id="auth-city"
-                      name="city"
+                    <label htmlFor="auth-email" className="auth-modal__label">Email *</label>
+                    <input
+                      id="auth-email"
+                      type="email"
+                      name="email"
                       className="auth-modal__input"
-                      value={formData.city}
+                      placeholder="you@example.com"
+                      value={formData.email}
                       onChange={handleInputChange}
                       required
-                    >
-                      <option value="">Select City</option>
-                      <option value="Islamabad">Islamabad</option>
-                      <option value="Karachi">Karachi</option>
-                      <option value="Lahore">Lahore</option>
-                      <option value="Rawalpindi">Rawalpindi</option>
-                      <option value="Peshawar">Peshawar</option>
-                      <option value="Multan">Multan</option>
-                      <option value="Faisalabad">Faisalabad</option>
-                      <option value="Quetta">Quetta</option>
-                    </select>
+                      autoComplete="email"
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-password" className="auth-modal__label">Password *</label>
+                    <input
+                      id="auth-password"
+                      type="password"
+                      name="password"
+                      className="auth-modal__input"
+                      placeholder="Minimum 6 characters"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-emergency-name" className="auth-modal__label">Emergency Contact Name *</label>
+                    <input
+                      id="auth-emergency-name"
+                      type="text"
+                      name="emergency_contact_name"
+                      className="auth-modal__input"
+                      placeholder="Contact person name"
+                      value={formData.emergency_contact_name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-emergency-phone" className="auth-modal__label">Emergency Contact Phone *</label>
+                    <input
+                      id="auth-emergency-phone"
+                      type="tel"
+                      name="emergency_contact_phone"
+                      className="auth-modal__input"
+                      placeholder="+92 300 1234567"
+                      value={formData.emergency_contact_phone}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
 
                   <div className="auth-modal__field">
@@ -235,32 +261,36 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
                       <option value="10+ years">10+ years</option>
                     </select>
                   </div>
-
+                </>
+              ) : (
+                <>
                   <div className="auth-modal__field">
-                    <label htmlFor="auth-emergency-name" className="auth-modal__label">Emergency Contact Name *</label>
+                    <label htmlFor="auth-email" className="auth-modal__label">Email</label>
                     <input
-                      id="auth-emergency-name"
-                      type="text"
-                      name="emergency_contact_name"
+                      id="auth-email"
+                      type="email"
+                      name="email"
                       className="auth-modal__input"
-                      placeholder="Contact person name"
-                      value={formData.emergency_contact_name}
+                      placeholder="you@example.com"
+                      value={formData.email}
                       onChange={handleInputChange}
                       required
+                      autoComplete="email"
                     />
                   </div>
 
                   <div className="auth-modal__field">
-                    <label htmlFor="auth-emergency-phone" className="auth-modal__label">Emergency Contact Phone *</label>
+                    <label htmlFor="auth-password" className="auth-modal__label">Password</label>
                     <input
-                      id="auth-emergency-phone"
-                      type="tel"
-                      name="emergency_contact_phone"
+                      id="auth-password"
+                      type="password"
+                      name="password"
                       className="auth-modal__input"
-                      placeholder="+92 300 1234567"
-                      value={formData.emergency_contact_phone}
+                      placeholder="Your password"
+                      value={formData.password}
                       onChange={handleInputChange}
                       required
+                      autoComplete="current-password"
                     />
                   </div>
                 </>

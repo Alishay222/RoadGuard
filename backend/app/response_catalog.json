@@ -70,7 +70,7 @@
   "greet": {
     "templates": [
       "I am ready to help with live alerts, incidents, SOS contacts, and quick fixes. Start by sharing your city or issue.",
-      "RoadGuard assistant is active. Tell me your city and I will fetch alerts, incidents, emergency contacts, or quick-fix help."
+      "Roady is active. Tell me your city and I will fetch alerts, incidents, emergency contacts, or quick-fix help."
     ],
     "suggestions": [
       "Any weather alerts nearby?",

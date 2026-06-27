@@ -18,10 +18,13 @@ import { Ionicons } from '@expo/vector-icons';
 export default function RegisterScreen() {
   const { register, isLoading } = useAuth();
   const { redirect } = useLocalSearchParams<{ redirect?: string }>();
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [location, setLocation] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [emergencyContact, setEmergencyContact] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,8 +32,16 @@ export default function RegisterScreen() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+
+    if (!location.trim()) {
+      newErrors.location = 'Location is required';
+    }
+
+    if (!phone.trim()) {
+      newErrors.phone = 'Phone number is required';
     }
 
     if (!email.trim()) {
@@ -45,7 +56,13 @@ export default function RegisterScreen() {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (password !== confirmPassword) {
+    if (!emergencyContact.trim()) {
+      newErrors.emergencyContact = 'Emergency contact is required';
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+    } else if (password !== confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -58,9 +75,12 @@ export default function RegisterScreen() {
 
     try {
       await register({
-        name: name.trim(),
+        name: firstName.trim(),
         email: email.trim(),
         password,
+        phone: phone.trim(),
+        city: location.trim(),
+        emergency_contact_phone: emergencyContact.trim(),
       });
       if (redirect) {
         router.replace(decodeURIComponent(redirect) as any);
@@ -88,16 +108,43 @@ export default function RegisterScreen() {
 
         <View style={styles.form}>
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.label}>First Name</Text>
             <TextInput
-              style={[styles.input, errors.name && styles.inputError]}
-              placeholder="John Doe"
+              style={[styles.input, errors.firstName && styles.inputError]}
+              placeholder="John"
               placeholderTextColor="#999"
-              value={name}
-              onChangeText={setName}
+              value={firstName}
+              onChangeText={setFirstName}
               editable={!isLoading}
             />
-            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+            {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Location</Text>
+            <TextInput
+              style={[styles.input, errors.location && styles.inputError]}
+              placeholder="Karachi"
+              placeholderTextColor="#999"
+              value={location}
+              onChangeText={setLocation}
+              editable={!isLoading}
+            />
+            {errors.location && <Text style={styles.errorText}>{errors.location}</Text>}
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              style={[styles.input, errors.phone && styles.inputError]}
+              placeholder="+92 300 1234567"
+              placeholderTextColor="#999"
+              value={phone}
+              onChangeText={setPhone}
+              editable={!isLoading}
+              keyboardType="phone-pad"
+            />
+            {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
           </View>
 
           <View style={styles.formGroup}>
@@ -142,6 +189,20 @@ export default function RegisterScreen() {
               </TouchableOpacity>
             </View>
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Emergency Contact</Text>
+            <TextInput
+              style={[styles.input, errors.emergencyContact && styles.inputError]}
+              placeholder="+92 311 1234567"
+              placeholderTextColor="#999"
+              value={emergencyContact}
+              onChangeText={setEmergencyContact}
+              editable={!isLoading}
+              keyboardType="phone-pad"
+            />
+            {errors.emergencyContact && <Text style={styles.errorText}>{errors.emergencyContact}</Text>}
           </View>
 
           <View style={styles.formGroup}>

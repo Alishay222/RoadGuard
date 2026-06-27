@@ -63,7 +63,7 @@ class GeminiChatService:
         }
 
         prompt = f"""
-You are RoadGuard, a road-safety chatbot for drivers in Pakistan.
+You are Roady, a road-safety chatbot for drivers in Pakistan.
 Use the backend context when it contains alerts, incidents, quick fixes, contacts, or
 location details. If the context is only a clarification or greeting, answer naturally
 as an intelligent RoadGuard assistant instead of repeating the draft.

@@ -35,6 +35,55 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
         # Count active users (users with is_active not set to False)
         active_users = await db.users.count_documents({"is_active": {"$ne": False}})
 
+        user_distribution_by_location = await db.users.aggregate([
+            {
+                "$project": {
+                    "location": {
+                        "$cond": [
+                            {
+                                "$gt": [
+                                    {
+                                        "$strLenCP": {
+                                            "$trim": {
+                                                "input": {"$ifNull": ["$city", ""]}
+                                            }
+                                        }
+                                    },
+                                    0,
+                                ]
+                            },
+                            {"$trim": {"input": {"$ifNull": ["$city", ""]}}},
+                            "Unknown",
+                        ]
+                    },
+                    "is_inactive": {"$eq": ["$is_active", False]},
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$location",
+                    "activeUsers": {
+                        "$sum": {"$cond": ["$is_inactive", 0, 1]}
+                    },
+                    "inactiveUsers": {
+                        "$sum": {"$cond": ["$is_inactive", 1, 0]}
+                    },
+                    "totalUsers": {"$sum": 1},
+                }
+            },
+            {"$sort": {"totalUsers": -1, "_id": 1}},
+            {"$limit": 12},
+            {
+                "$project": {
+                    "_id": 0,
+                    "location": "$_id",
+                    "activeUsers": 1,
+                    "inactiveUsers": 1,
+                    "totalUsers": 1,
+                }
+            },
+        ]).to_list(12)
+
         # Get recent incidents
         recent_incidents = await db.incident_reports.find(
             {}, 
@@ -48,6 +97,7 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
                 "totalIncidents": total_incidents,
                 "pendingIncidents": pending_incidents,
                 "activeUsers": active_users,
+                "userDistributionByLocation": user_distribution_by_location,
             },
             "recentIncidents": recent_incidents or [],
         }
@@ -60,6 +110,7 @@ async def get_admin_stats(current_user: dict = Depends(get_current_user)):
                 "totalIncidents": 0,
                 "pendingIncidents": 0,
                 "activeUsers": 0,
+                "userDistributionByLocation": [],
             },
             "recentIncidents": [],
         }

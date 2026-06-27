@@ -8,6 +8,9 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+  phone?: string;
+  city?: string;
+  emergency_contact_phone?: string;
 }
 
 export interface TokenResponse {
