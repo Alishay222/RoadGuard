@@ -7,6 +7,7 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
   const [tab, setTab] = useState('login')
   const [formData, setFormData] = useState({
     name: '',
+    surname: '',
     email: '',
     password: '',
     phone: '',
@@ -35,8 +36,11 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
         await login(formData.email, formData.password)
         setSuccessMsg('Signed in successfully! 👋')
       } else {
-        // For signup, pass the entire formData
-        await register(formData)
+        // For signup, combine first name and surname and send the complete payload
+        await register({
+          ...formData,
+          name: `${formData.name.trim()} ${formData.surname.trim()}`.trim(),
+        })
         setSuccessMsg('Registered successfully! 🎉')
       }
       setTimeout(onClose, 1500)
@@ -109,7 +113,22 @@ export default function AuthModal({ onClose, reason, disableClose = false }) {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      autoComplete="name"
+                      autoComplete="given-name"
+                    />
+                  </div>
+
+                  <div className="auth-modal__field">
+                    <label htmlFor="auth-surname" className="auth-modal__label">Surname *</label>
+                    <input
+                      id="auth-surname"
+                      type="text"
+                      name="surname"
+                      className="auth-modal__input"
+                      placeholder="Your surname"
+                      value={formData.surname}
+                      onChange={handleInputChange}
+                      required
+                      autoComplete="family-name"
                     />
                   </div>
 

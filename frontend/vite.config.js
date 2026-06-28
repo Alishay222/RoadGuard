@@ -7,7 +7,7 @@ export default defineConfig({
     host: true,
     // Allow requests from any host (useful for ngrok and remote tunnels)
     // Note: setting this to 'all' relaxes host header checks in the dev server.
-    allowedHosts: 'all',
+    allowedHosts: true,
   },
 })
 
