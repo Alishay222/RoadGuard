@@ -1239,11 +1239,26 @@
 
 .app-product__contacts-list li {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 8px 10px;
   border-radius: 8px;
   background: var(--bg-warm);
+}
+
+.app-product__contacts-list li span {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-product__contacts-list li strong {
+  width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.app-product__contacts-list li a {
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .app-product__contacts-close {
