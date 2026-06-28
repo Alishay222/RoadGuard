@@ -184,10 +184,6 @@ export default function AdminUsers() {
     const newStatus = !user.is_active
     setConfirmDialog({ type: 'status', user, newStatus, title: newStatus ? 'Activate User' : 'Deactivate User', message: `Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} ${user.name || user.email}?` })
   }
-  const handleToggleAdmin = (user) => {
-    const newAdminState = !user.is_admin
-    setConfirmDialog({ type: 'admin', user, newAdminState, title: newAdminState ? 'Make Admin' : 'Remove Admin', message: `Are you sure you want to ${newAdminState ? 'grant admin access to' : 'remove admin access from'} ${user.name || user.email}?` })
-  }
 
   const confirmAction = async () => {
     if (!confirmDialog) return
@@ -201,10 +197,6 @@ export default function AdminUsers() {
         const r = await fetch(`${API_BASE_URL}/api/admin/users/${confirmDialog.user._id}/status?active=${confirmDialog.newStatus}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } })
         if (r.ok) { setUsers(u => u.map(x => x._id === confirmDialog.user._id ? { ...x, is_active: confirmDialog.newStatus } : x)); alert(`User ${confirmDialog.newStatus ? 'activated' : 'deactivated'} successfully`) }
         else { const d = await r.json(); alert(`Error: ${d.detail || 'Failed to update status'}`) }
-      } else if (confirmDialog.type === 'admin') {
-        const r = await fetch(`${API_BASE_URL}/api/admin/users/${confirmDialog.user._id}/admin?admin=${confirmDialog.newAdminState}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } })
-        if (r.ok) { setUsers(u => u.map(x => x._id === confirmDialog.user._id ? { ...x, is_admin: confirmDialog.newAdminState } : x)); alert(`Admin access ${confirmDialog.newAdminState ? 'granted' : 'revoked'} successfully`) }
-        else { const d = await r.json(); alert(`Error: ${d.detail || 'Failed to update admin role'}`) }
       }
       setConfirmDialog(null)
     } catch { alert('An error occurred. Please try again.') }
@@ -329,14 +321,6 @@ export default function AdminUsers() {
                                   disabled={actionLoading === user._id}
                                   small
                                 >{user.is_active === false ? 'Activate' : 'Deactivate'}</Btn>
-                                <Btn
-                                  grad={user.is_admin
-                                    ? 'linear-gradient(135deg,#450a0a,#dc2626)'
-                                    : 'linear-gradient(135deg,#3b0764,#7c3aed)'}
-                                  onClick={() => handleToggleAdmin(user)}
-                                  disabled={actionLoading === user._id}
-                                  small
-                                >{user.is_admin ? 'Remove Admin' : 'Make Admin'}</Btn>
                                 <Btn
                                   grad="linear-gradient(135deg,#7f1d1d,#dc2626)"
                                   onClick={() => handleDeleteUser(user)}
